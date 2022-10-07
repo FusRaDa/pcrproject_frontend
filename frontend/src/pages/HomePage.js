@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import AuthContext from '../context/AuthContext'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 const HomePage = () => {
   // let [notes, setNotes] = useState([])
@@ -50,11 +52,15 @@ const HomePage = () => {
 
       <ul>
         {batches.map(batch => (
-          <li key={batch.pk}>
-            <div>{batch.assay}</div>
-            <div>{batch.numberOfSamples}</div>
-          </li>
+          <Row key={batch.pk}>
+            <Col>Assay Code:{" " + batch.assay}</Col>
+            <Col>Batch Date:{batch.batchDate}</Col>
+            <Col>Batch Processed:{batch.isBatchProccessed ? ' True' : ' False'}</Col>
+            <Col>Number of Samples:{batch.numberOfSamples}</Col>
+          </Row>
         ))}
+        
+        <button>Create Batch</button>
       </ul>
     </div>
   )
