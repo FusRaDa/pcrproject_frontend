@@ -1,14 +1,22 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
+import Col from "react-bootstrap/esm/Col";
+import Row from "react-bootstrap/esm/Row";
 import { useParams } from "react-router-dom";
 import BatchContext from "../context/BatchContext";
 
 const EditBatch = () => {
-  let {getBatch} = useContext(BatchContext)
+  let {getBatch, batch} = useContext(BatchContext)
   const params = useParams()
-  getBatch(params.pk)
+
+  useEffect(() => {
+    getBatch(params.pk)
+    // eslint-disable-next-line
+  }, [])
 
   return (
-    <div>edit</div>
+    <Row>
+      <Col>{batch.numberOfSamples}</Col>
+    </Row>
   )
 }
 

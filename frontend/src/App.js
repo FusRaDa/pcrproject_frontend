@@ -18,7 +18,6 @@ function App() {
         <ProviderComposer providers={[provider(AuthProvider), provider(BatchProvider)]}>
 
           <Header/>
- 
           <Routes>
             <Route element={<PrivateRoute/>}>
               <Route element={<HomePage/>} path="/" exact />
