@@ -6,23 +6,28 @@ import LoginPage from './pages/LoginPage'
 import Header from './components/Header'
 import React from 'react';
 import { AuthProvider } from './context/AuthContext';
+import CreateBatch from './batches/CreateBatch';
+import { BatchProvider } from './context/BatchContext';
+import { provider, ProviderComposer } from './compose';
+import EditBatch from './batches/EditBatch';
 
 function App() {
   return (
     <div className="App">
       <Router>
-        <AuthProvider>
+        <ProviderComposer providers={[provider(AuthProvider), provider(BatchProvider)]}>
 
-        <Header/>
+          <Header/>
  
           <Routes>
             <Route element={<PrivateRoute/>}>
               <Route element={<HomePage/>} path="/" exact />
+              <Route element={<CreateBatch/>} path="/create_batch" exact />
+              <Route element={<EditBatch/>} path="/edit_batch/:pk" exact />
             </Route>
             <Route element={<LoginPage/>} path="/login" />
           </Routes>
-        </AuthProvider>
-                  
+        </ProviderComposer>        
       </Router>
     </div>
   );
