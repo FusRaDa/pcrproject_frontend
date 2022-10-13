@@ -5,16 +5,27 @@ import AuthContext from "../context/AuthContext"
 const CreateBatch = () => {
   const navigate = useNavigate()
   let {authTokens} = useContext(AuthContext)
- 
+
+
+  let addFields = (e) => {
+    e.preventDefault()
+    var data = {}
+    data[e.target.assay.value] = e.target.numberOfSamples.value
+    console.log(data)
+  }
+  
+
   let addBatch = async (e) => {
     e.preventDefault()
+    var data = {}
+    data["id4"] = 500
     let response = await fetch('http://127.0.0.1:8000/api/batches/create/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       },
-      body: JSON.stringify({'assay':e.target.assay.value, 'numberOfSamples':e.target.numberOfSamples.value})
+      body: JSON.stringify({'assay':e.target.assay.value, 'numberOfSamples':e.target.numberOfSamples.value, 'miscFields': {data}})
     })
     if(response.status === 201) {
       console.log('batch created successfully')
@@ -26,7 +37,7 @@ const CreateBatch = () => {
 
   return (
     <div>
-      <form onSubmit={addBatch}>
+      <form onSubmit={addFields}>
         <input type="text" name="assay" placeholder="Enter Assay Code"/>
         <input type="text" name="numberOfSamples" placeholder="Enter Number Of Samples"/>
         <input type="submit"/>

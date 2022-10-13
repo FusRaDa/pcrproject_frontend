@@ -23,7 +23,6 @@ const ListBatch = () => {
       }
     })
     let data = await response.json()
-    console.log(data)
     if(response.status === 200) {
       setBatches(data)
     } else if (response.statusText === 'Unauthorized') {
