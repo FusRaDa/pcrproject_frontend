@@ -25,6 +25,7 @@ const ListBatch = () => {
     let data = await response.json()
     if(response.status === 200) {
       setBatches(data)
+      console.log(data)
     } else if (response.statusText === 'Unauthorized') {
       logoutUser()
     }
@@ -35,7 +36,7 @@ const ListBatch = () => {
       <ul>
         {batches.map(batch => (
           <Row key={batch.pk}>
-            <Col>Assay Code:{" " + batch.assay}</Col>
+            <Col>Assay Code:{" " + batch.fieldLabels.squad}</Col>
             <Col>Batch Date:{batch.batchDate}</Col>
             <Col>Batch Processed:{batch.isBatchProccessed ? ' True' : ' False'}</Col>
             <Col>Number of Samples:{batch.numberOfSamples}</Col>
