@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react"
 import AuthContext from "../context/AuthContext"
 import Row from 'react-bootstrap/Row'
 
-const AddBatchLabels = () => {
+const BatchLabels = () => {
   let {authTokens} = useContext(AuthContext)
   let [fields, setFields] = useState([])
   let [change, setChange] = useState(false)
@@ -25,7 +25,6 @@ const AddBatchLabels = () => {
       setFields(data)
       console.log(data)
       setChange(false)
-
     } else {
       alert('error')
     }
@@ -33,36 +32,47 @@ const AddBatchLabels = () => {
 
   let addLabel = async (e) => {
     e.preventDefault()
-    let response = await fetch('http://127.0.0.1:8000/api/labels/create/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-      body: JSON.stringify({'label': e.target.label.value})
-    })
-    if(response.status === 201) {
-      console.log('label added successfully')
-      setChange(true)
-      document.getElementById("add_label").value = ""
+    let edit = notUpdating()
+    if (edit === true) {
+      let response = await fetch('http://127.0.0.1:8000/api/labels/create/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+        },
+        body: JSON.stringify({'label': e.target.label.value})
+      })
+      if(response.status === 201) {
+        console.log('label added successfully')
+        setChange(true)
+        document.getElementById("add_label").value = ""
+      } else {
+        alert('Column Name Already Exists')
+      }
     } else {
-      alert('Column Name Already Exists')
+      alert('update fields first')
     }
+  
   }
 
   let deleteLabel = async (pk) => {
-    let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/destroy/`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-    })
-    if(response.status === 204) {
-      console.log('label deleted')
-      setChange(true)
+    let edit = notUpdating()
+    if (edit === true) {
+      let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/destroy/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+        },
+      })
+      if(response.status === 204) {
+        console.log('label deleted')
+        setChange(true)
+      } else {
+        alert('error')
+      }
     } else {
-      alert('error')
+      alert('update fields first')
     }
   }
 
@@ -70,7 +80,6 @@ const AddBatchLabels = () => {
     let update = document.getElementById(pk).value
     let current = document.getElementById(pk).defaultValue
     if (update !== current) {
-        console.log(update)
       let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/update/`, {
         method: 'PUT',
         headers: {
@@ -123,6 +132,18 @@ const AddBatchLabels = () => {
     }
   }
 
+  let notUpdating = () => {
+    let list = []
+    fields.map(field => (
+      list.push(document.getElementById(field.pk).readOnly)
+    ))
+    if (list.every(element => element === true)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   return (
     <div>
       {fields.map(field => (
@@ -146,4 +167,4 @@ const AddBatchLabels = () => {
   )
 }
 
-export default AddBatchLabels
+export default BatchLabels

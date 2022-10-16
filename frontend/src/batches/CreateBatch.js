@@ -1,23 +1,46 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AuthContext from "../context/AuthContext"
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 const CreateBatch = () => {
   const navigate = useNavigate()
   let {authTokens} = useContext(AuthContext)
-  const [inputFields, setInputFields] = useState([
-    {column: "", info: ""}
-  ])
+  let [labels, setLabels] = useState([])
+
+  let getLabels = async () => {
+    let response = await fetch('http://127.0.0.1:8000/api/labels/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':'Bearer ' + String(authTokens.access)
+      },
+    })
+    let data = await response.json()
+    if(response.status === 200) {
+      setLabels(data)
+      console.log(data)
+    } else {
+      alert('error')
+    }
+  }
+
+  useEffect(() => {
+    getLabels()
+    // eslint-disable-next-line 
+  }, [])
 
   let addBatch = async (e) => {
     e.preventDefault()
+    let data = batchData(e)
     let response = await fetch('http://127.0.0.1:8000/api/batches/create/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       },
-      body: JSON.stringify({'fieldLabels': {inputFields}})
+      body: JSON.stringify({"fieldLabels": data})
     })
     if(response.status === 201) {
       console.log('batch created successfully')
@@ -27,43 +50,45 @@ const CreateBatch = () => {
     }
   }
 
-  const handleFormChange = (index, event) => {
-    let data = [...inputFields]
-    data[index][event.target.name] = event.target.value
-    setInputFields(data)
-    console.log(inputFields)
-  }
-
-  const addFields = () => {
-    let newfield = { column: '', info: '' }
-    setInputFields([...inputFields, newfield])
-    console.log(inputFields)
+  let batchData = (e) => {
+    e.preventDefault()
+    let keys = []
+    labels.map(label => (
+      keys.push(label.label)
+    ))
+    let values = Array.from(e.target.info)
+    let data = {}
+    for (var i = 0; i < values.length; i++) {
+      data[keys[i]] = values[i].value   
+    }
+    return data
   }
 
   return (
     <div>
-      <form onSubmit={addBatch}>
-        {inputFields.map((input, index) => {
-          return (
-            <div key={index}>
+      <Row>
+        <Col>
+          {labels.map(label => (
+            <div key={label.pk}>
+              <input defaultValue={label.label} readOnly/>
+            </div>
+          ))}
+        </Col>
+        <Col>
+        <form onSubmit={addBatch}>
+          {labels.map(label => (
+            <div key={`info_${label.pk}`}>
               <input
-                name='column'
-                placeholder='Enter Column Name'
-                value={input.column}
-                onChange={event => handleFormChange(index, event)}
-              />
-              <input
-                name='info'
-                placeholder='Enter Batch Information'
-                value={input.info}
-                onChange={event => handleFormChange(index, event)}
+                type="text"
+                name="info"
+                placeholder={`Enter ${label.label} Information`}
               />
             </div>
-          )
-        })}
-        <button onClick={addBatch}>Submit</button>
-      </form>
-      <button onClick={addFields}>Add More..</button>
+            ))}
+          <input type="submit"/>
+        </form>
+        </Col>
+      </Row>
     </div>
   )
 }

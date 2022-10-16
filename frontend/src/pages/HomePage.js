@@ -1,6 +1,7 @@
 import React from 'react'
 import ListAssay from '../assays/ListAssay'
-import AddBatchLabels from '../batches/AddBatchLabels'
+import BatchLabels from '../batches/BatchLabels'
+import CreateBatch from '../batches/CreateBatch'
 import ListBatch from '../batches/ListBatch'
 
 const HomePage = () => {
@@ -8,7 +9,7 @@ const HomePage = () => {
   return (
     <div>
       <p>You are logged to the home page!</p>
-      <AddBatchLabels/>
+      <CreateBatch/>
     </div>
   )
 }
