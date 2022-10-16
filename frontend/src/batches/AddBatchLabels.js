@@ -1,14 +1,12 @@
 import React, { useContext, useState, useEffect } from "react"
 import AuthContext from "../context/AuthContext"
 import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-import Form from 'react-bootstrap/Form'
 
 const AddBatchLabels = () => {
   let {authTokens} = useContext(AuthContext)
   let [fields, setFields] = useState([])
   let [change, setChange] = useState(false)
-  
+
   useEffect(() => {
     getLabels()
     // eslint-disable-next-line
@@ -70,23 +68,50 @@ const AddBatchLabels = () => {
 
   let updateLabel = async (pk) => {
     let update = document.getElementById(pk).value
-    let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/update/`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-      body: JSON.stringify({'label': update})
-    })
-    if(response.status === 200) {
-      console.log('label updated')
-      setChange(true)
+    let current = document.getElementById(pk).defaultValue
+    if (update !== current) {
+        console.log(update)
+      let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/update/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+        },
+        body: JSON.stringify({'label': update})
+      })
+      if(response.status === 200) {
+        console.log('label updated')
+      } else {
+        alert('error')
+      }
     } else {
-      alert('error')
+      alert('same field name')
     }
   }
 
-  let updateButton = (pk) => {
+  let updateLabelEnter = async (e) => {
+    e.preventDefault()
+    let update = e.target.field.value
+    if (update !== e.target.field.defaultValue) {
+      let response = await fetch(`http://127.0.0.1:8000/api/labels/${e.target.field.id}/update/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+        },
+        body: JSON.stringify({'label': update})
+      })
+      if(response.status === 200) {
+        console.log('label updated')
+        document.getElementById(e.target.field.id).readOnly = true
+        document.getElementById(`button_${e.target.field.id}`).defaultValue = 'Edit'
+      } else {
+        alert('error')
+      }
+    }
+  }
+
+  let editFields = (pk) =>  {
     let isReadOnly = document.getElementById(pk).readOnly
     if (isReadOnly) {
       document.getElementById(pk).readOnly = false
@@ -94,31 +119,21 @@ const AddBatchLabels = () => {
     } else {
       document.getElementById(pk).readOnly = true
       document.getElementById(`button_${pk}`).defaultValue = 'Edit'
-      // updateLabel(pk)
+      updateLabel(pk)
     }
   }
 
   return (
     <div>
-      <ul>
-        {fields.map(field => (
-          <Row key={field.pk}>
-            <Col>
-              <Form>
-                <Form.Group>
-                  <Form.Control type="text" id={field.pk} defaultValue={field.label} readOnly/>
-                </Form.Group>
-              </Form>
-            </Col>
-            <Col>
-              <form>
-                <input id={`button_${field.pk}`} type="button" defaultValue="Edit" onClick={() => {updateButton(field.pk)}} />
-                <input type="button" defaultValue="Delete" onClick={() => deleteLabel(field.pk)} />
-              </form>
-            </Col>
-          </Row>
-        ))}
-      </ul>
+      {fields.map(field => (
+        <Row key={field.pk}>
+          <form onSubmit={updateLabelEnter}>
+              <input name="field" type="text" id={field.pk} defaultValue={field.label} readOnly/>
+              <input type="button" id={`button_${field.pk}`} defaultValue="Edit" onClick={() => editFields(field.pk)} />              
+              <input type="button" defaultValue="Delete" onClick={() => deleteLabel(field.pk)} />
+          </form>
+        </Row>
+      ))}
       <Row>
         <form onSubmit={addLabel}>
           <input type="text" id="add_label" name="label" placeholder="Enter New Column"/>
