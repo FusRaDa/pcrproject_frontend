@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react'
 import AuthContext from '../context/AuthContext'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-import { Link } from 'react-router-dom'
+import BootstrapTable from 'react-bootstrap-table-next'
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter'
 
 const ListBatch = () => {
 
-  let [batches, setBatches] = useState([])
+  let [batches, setBatches] = useState([]) //built in models
   let {authTokens, logoutUser} = useContext(AuthContext)
-
+  
   useEffect(() => {
     getBatches()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -26,30 +25,27 @@ const ListBatch = () => {
     if(response.status === 200) {
       setBatches(data)
       console.log(data)
+    
     } else if (response.statusText === 'Unauthorized') {
       logoutUser()
     }
   }
 
+  const nullChecker = cell => (!cell ? "NA" : cell)
+
+  const columns = [
+    { text: 'Primary Key', dataField: 'pk', hidden: true},
+    { text: 'Price', dataField: 'fieldLabels.Price', formatter: nullChecker },
+    { text: 'Color', dataField: 'fieldLabels.Color', formatter: nullChecker, filter: textFilter()},
+    { text: 'Size', dataField: 'fieldLabels.Size', formatter: nullChecker },
+    { text: 'Height', dataField: 'fieldLabels.Height', formatter: nullChecker }
+  ]
+
   return (
-    <div>
-      <ul>
-        {batches.map(batch => (
-          <Row key={batch.pk}>
-            <Col>Assay Code:{" " + batch.fieldLabels.squad}</Col>
-            <Col>Batch Date:{batch.batchDate}</Col>
-            <Col>Batch Processed:{batch.isBatchProccessed ? ' True' : ' False'}</Col>
-            <Col>Number of Samples:{batch.numberOfSamples}</Col>
-
-            <Link to={`/edit_batch/${batch.pk}`}>Edit</Link>
-
-          </Row>
-        ))}
-        <Link to="/create_batch">Add Batch</Link>
-      </ul>
+    <div style={{ maxWidth: '100%' }}>
+      <BootstrapTable columns={columns} data={batches} keyField="pk" filter={filterFactory()} />
     </div>
   )
-
 }
 
 export default ListBatch
