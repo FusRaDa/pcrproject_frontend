@@ -35,10 +35,17 @@ const ListBatch = () => {
 
   const columns = [
     { text: 'Primary Key', dataField: 'pk', hidden: true},
+    { text: 'Assay Code', dataField: 'assay.code', formatter: nullChecker },
+    { text: 'Assay Name', dataField: 'assay.name', formatter: nullChecker },
+    { text: '# of Samples', dataField: 'numberOfSamples', formatter: nullChecker },
+    { text: 'Batch Made', dataField: 'batchDate', formatter: nullChecker },
+
     { text: 'Price', dataField: 'fieldLabels.Price', formatter: nullChecker },
     { text: 'Color', dataField: 'fieldLabels.Color', formatter: nullChecker, filter: textFilter()},
     { text: 'Size', dataField: 'fieldLabels.Size', formatter: nullChecker },
-    { text: 'Height', dataField: 'fieldLabels.Height', formatter: nullChecker }
+    { text: 'Height', dataField: 'fieldLabels.Height', formatter: nullChecker },
+
+    { text: 'Batch Processed', dataField: 'isBatchProcessed', formatter: nullChecker }
   ]
 
   return (
