@@ -10,7 +10,6 @@ const HomePage = () => {
     <div>
       <p>You are logged to the home page!</p>
       <ListBatch/>
-
       <Link to="/create_batch">Add Batch</Link>
 
     </div>

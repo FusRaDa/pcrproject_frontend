@@ -2,12 +2,14 @@ import React, { useState, useEffect, useContext } from 'react'
 import AuthContext from '../context/AuthContext'
 import BootstrapTable from 'react-bootstrap-table-next'
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter'
+import { useNavigate } from "react-router-dom"
 
 const ListBatch = () => {
 
+  const navigate = useNavigate()
   let [batches, setBatches] = useState([]) //built in models
   let {authTokens, logoutUser} = useContext(AuthContext)
-  
+ 
   useEffect(() => {
     getBatches()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,9 +50,16 @@ const ListBatch = () => {
     { text: 'Batch Processed', dataField: 'isBatchProcessed', formatter: nullChecker }
   ]
 
+  const rowEvents = {
+    onClick: (e, row, rowIndex) => {
+      console.log(`clicked on row with index: ${row.pk}`);
+      navigate(`/edit_batch/${row.pk}`)
+    },
+  };
+
   return (
     <div style={{ maxWidth: '100%' }}>
-      <BootstrapTable columns={columns} data={batches} keyField="pk" filter={filterFactory()} />
+      <BootstrapTable columns={columns} data={batches} keyField="pk" filter={filterFactory()} rowEvents={rowEvents} hover striped condensed />
     </div>
   )
 }

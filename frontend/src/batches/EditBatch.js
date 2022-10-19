@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
-
 const EditBatch = () => {
+  
   const navigate = useNavigate()
   const params = useParams()
   let [batch, setBatch] = useState([])
   let {authTokens} = useContext(AuthContext)
+  let [recieved, setRecieved] = useState(false)
 
   let getBatch = async () => {
     let response = await fetch(`http://127.0.0.1:8000/api/batches/${params.pk}/retrieve/`, {
@@ -21,6 +22,7 @@ const EditBatch = () => {
     if(response.status === 200) {
       console.log('batch retrieved')
       setBatch(batch)
+      setRecieved(true)
     } else {
       alert('error')
     }
@@ -67,20 +69,21 @@ const EditBatch = () => {
     // eslint-disable-next-line
   }, [])
  
-  return (
-    <div>
-      <form onSubmit={updateBatch}>
-        Update Batch
-        <input type="text" name="assay" defaultValue={batch.assay}/>
-        <input type="text" name="numberOfSamples" defaultValue={batch.numberOfSamples}/>
-        <input type="submit"/>
-      </form>
+  if (recieved) {
+    return (
       <div>
-        <button onClick={deleteBatch}>Delete</button>
+        <form onSubmit={updateBatch}>
+          Update Batch
+          <input type="text" name="assay" defaultValue={batch.assay.code}/>
+          <input type="text" name="numberOfSamples" defaultValue={batch.numberOfSamples}/>
+          <input type="submit"/>
+        </form>
+        <div>
+          <button onClick={deleteBatch}>Delete</button>
+        </div>
       </div>
-    </div>
-  )
-  
+    )
+  }
 }
 
 export default EditBatch
