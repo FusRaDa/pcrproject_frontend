@@ -144,7 +144,9 @@ const EditBatch = () => {
           <div>
               <Form.Select name="assay" aria-label="Default select example">
                 <option value={batch.assay.pk}>{`${batch.assay.code}-${batch.assay.name}`}</option>
-                {assays.map(assay => (
+                {assays
+                  .filter(assay => assay.name !== batch.assay.name)
+                  .map(assay => (
                   <option key={assay.pk} value={assay.pk}>{`${assay.code}-${assay.name}`}</option>
                 ))}
               </Form.Select>

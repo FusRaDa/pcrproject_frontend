@@ -83,7 +83,7 @@ export const AuthProvider = ({children}) => {
       }
     }, fourMinutes)
     return () => clearInterval(interval)
-
+    // eslint-disable-next-line
   }, [authTokens, loading])
 
   return (

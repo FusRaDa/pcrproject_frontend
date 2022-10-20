@@ -11,6 +11,7 @@ const ListAssay = () => {
 
   useEffect(() => {
     getAssays()
+    // eslint-disable-next-line
   }, [])
 
   let getAssays = async () => {
