@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import AuthContext from '../context/AuthContext'
-import Table from '../components/Table'
+import BatchTable from '../components/BatchTable'
 import styled from 'styled-components'
 
 const Styles = styled.div`
@@ -40,7 +40,7 @@ const Styles = styled.div`
 
 const ListBatch = () => {
 
-  let [batches, setBatches] = useState([]) //built in models
+  let [batches, setBatches] = useState([]) 
   let {authTokens, logoutUser} = useContext(AuthContext)
   let [labels, setLabels] = useState([])
   
@@ -61,6 +61,7 @@ const ListBatch = () => {
     let data = await response.json()
     if(response.status === 200) {
       setBatches(data)
+      console.log(data)
     } else if (response.statusText === 'Unauthorized') {
       logoutUser()
     }
@@ -82,6 +83,11 @@ const ListBatch = () => {
     }
   }
 
+  //replace underscore with spaces for header column
+  let spaceLabels = (string) => {
+    return string.replace(/_+/g, ' ').trim()
+  }
+
   let createColumns = () => {
     const columns = [
       {
@@ -99,18 +105,26 @@ const ListBatch = () => {
       {
         Header: '# of Samples',
         accessor: 'numberOfSamples'
+      },
+      {
+        Header: 'DNA Extraction Group',
+        accessor: 'dna_extraction'
+      },
+      {
+        Header: 'RNA/Total-Nucleic Extraction Group',
+        accessor: 'rna_extraction'
       }
     ]
 
     labels.forEach(label => {
-      columns.push({Header: `${label.label}`, accessor: `fieldLabels.${label.label}`})
+      columns.push({Header: `${spaceLabels(label.label)}`, accessor: `fieldLabels.${label.label}`})
     })
     return columns
   }
 
   return (
     <Styles>
-      <Table columns={createColumns()} data={batches} />
+      <BatchTable columns={createColumns()} data={batches} />
     </Styles>
   )
 }

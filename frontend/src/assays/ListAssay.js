@@ -25,6 +25,7 @@ const ListAssay = () => {
     let data = await response.json()
     if (response.status === 200) {
       setAssays(data)
+      console.log(data)
     } else if (response.statusText === 'Unauthorized') {
       logoutUser()
     }
@@ -37,8 +38,7 @@ const ListAssay = () => {
           <Row key={assay.pk}>
             <Col>Assay Name: {assay.name}</Col>
             <Col>Assay Code: {assay.code}</Col>
-            <Col>Assay Group: {assay.group}</Col>
-            <Col>Assay Reagent: {assay.reagent}</Col>
+      
 
             <Link to={`/edit_assay/${assay.pk}`}>Edit</Link>
           </Row>

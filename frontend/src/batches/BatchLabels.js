@@ -40,7 +40,7 @@ const BatchLabels = () => {
           'Content-Type': 'application/json',
           'Authorization':'Bearer ' + String(authTokens.access)
         },
-        body: JSON.stringify({'label': e.target.label.value})
+        body: JSON.stringify({'label': underscoreLabels(e.target.label.value)})
       })
       if(response.status === 201) {
         console.log('label added successfully')
@@ -52,7 +52,6 @@ const BatchLabels = () => {
     } else {
       alert('update fields first')
     }
-  
   }
 
   let deleteLabel = async (pk) => {
@@ -76,6 +75,7 @@ const BatchLabels = () => {
     }
   }
 
+  //update label by pressing submit
   let updateLabel = async (pk) => {
     let update = document.getElementById(pk).value
     let current = document.getElementById(pk).defaultValue
@@ -86,7 +86,7 @@ const BatchLabels = () => {
           'Content-Type': 'application/json',
           'Authorization':'Bearer ' + String(authTokens.access)
         },
-        body: JSON.stringify({'label': update})
+        body: JSON.stringify({'label': underscoreLabels(update)})
       })
       if(response.status === 200) {
         console.log('label updated')
@@ -98,6 +98,7 @@ const BatchLabels = () => {
     }
   }
 
+  //update label by pressing enter
   let updateLabelEnter = async (e) => {
     e.preventDefault()
     let update = e.target.field.value
@@ -108,7 +109,7 @@ const BatchLabels = () => {
           'Content-Type': 'application/json',
           'Authorization':'Bearer ' + String(authTokens.access)
         },
-        body: JSON.stringify({'label': update})
+        body: JSON.stringify({'label': underscoreLabels(update)})
       })
       if(response.status === 200) {
         console.log('label updated')
@@ -132,6 +133,7 @@ const BatchLabels = () => {
     }
   }
 
+  //only allows a label to be updated one at a time
   let notUpdating = () => {
     let list = []
     fields.map(field => (
@@ -144,12 +146,22 @@ const BatchLabels = () => {
     }
   }
 
+  //replace space with underscore to be compatible with table - ListBatch.js
+  let underscoreLabels = (string) => {
+    return string.replace(/ /g, '_')
+  }
+
+  //replace underscore with spaces for header column
+  let spaceLabels = (string) => {
+    return string.replace(/_+/g, ' ').trim()
+  }
+
   return (
     <div>
       {fields.map(field => (
         <Row key={field.pk}>
           <form onSubmit={updateLabelEnter}>
-              <input name="field" type="text" id={field.pk} defaultValue={field.label} readOnly/>
+              <input name="field" type="text" id={field.pk} defaultValue={spaceLabels(field.label)} readOnly/>
               <input type="button" id={`button_${field.pk}`} defaultValue="Edit" onClick={() => editFields(field.pk)} />              
               <input type="button" defaultValue="Delete" onClick={() => deleteLabel(field.pk)} />
           </form>
@@ -161,8 +173,6 @@ const BatchLabels = () => {
           <input type="submit"/>
         </form>
       </Row>
-
-      
     </div>
   )
 }

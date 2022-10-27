@@ -1,7 +1,7 @@
 import { useTable } from 'react-table'
 import { useNavigate } from "react-router-dom"
 
-const Table = ({columns, data}) => {
+const AssayTable = ({columns, data}) => {
   const navigate = useNavigate()
   const {
     getTableProps,
@@ -44,4 +44,4 @@ const Table = ({columns, data}) => {
   )
 }
 
-export default Table
+export default AssayTable
