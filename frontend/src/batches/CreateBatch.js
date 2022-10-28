@@ -14,7 +14,6 @@ const CreateBatch = () => {
   let [assays, setAssays] = useState([])
   let [rna, setRNA] = useState(true)
   let [dna, setDNA] = useState(true)
- 
 
   let getLabels = async () => {
     let response = await fetch('http://127.0.0.1:8000/api/labels/', {
@@ -109,8 +108,6 @@ const CreateBatch = () => {
   }
 
   let chooseAssay = (e) => {
-    console.log(document.getElementById('dna')) //help
-   
     for (let i=0; i<assays.length; i++) {
       //ignore eslint warning
       // eslint-disable-next-line
@@ -125,21 +122,38 @@ const CreateBatch = () => {
     setDNA(true)
     setRNA(true)
 
-    //configure
+    //for single assay
     if (chosenAssay.group.length === 0) {
       if (chosenAssay.type === 'DNA') {
         setDNA(false)
+        document.getElementById('rna_value').value=""
       }
       if (chosenAssay.type === 'RNA' || chosenAssay.type === 'Total nucleic') {
         setRNA(false)
+        document.getElementById('dna_value').value=""
       }
+    //for assays in a group
     } else if (chosenAssay.group.length >= 0) {
+      let dna = false
+      let rna = false
       for (let i=0; i<chosenAssay.group.length; i++) {
         if (chosenAssay.group[i].type === 'DNA') {
-          setDNA(false)
+          dna = true
         }
         if (chosenAssay.group[i].type === 'RNA' || chosenAssay.group[i].type === 'Total nucleic') {
-          setRNA(false)
+          rna = true
+        }
+      }
+      if (dna) {
+        setDNA(false)
+        if (!rna) {
+          document.getElementById('rna_value').value=""
+        }
+      }
+      if (rna) {
+        setRNA(false)
+        if (!dna) {
+          document.getElementById('dna_value').value=""
         }
       }
     }
@@ -165,11 +179,11 @@ const CreateBatch = () => {
           </Form.Group>
           <Form.Group>
             <Form.Label>DNA Extraction Group</Form.Label>
-            <Form.Control name="dna" type="text" required={dna===false ? true : false} placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} disabled={dna}/>
+            <Form.Control id="dna_value" name="dna" type="text" required={dna===false ? true : false} placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} disabled={dna}/>
           </Form.Group>
           <Form.Group>
             <Form.Label>RNA/Total-Nucleic Group</Form.Label>
-            <Form.Control name="rna" type="text" required={dna===false ? true : false} placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} disabled={rna}/>
+            <Form.Control id="rna_value" name="rna" type="text" required={dna===false ? true : false} placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} disabled={rna}/>
           </Form.Group>
         
           <Form.Label>Additional Information</Form.Label>
