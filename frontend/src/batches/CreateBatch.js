@@ -1,39 +1,21 @@
 import React, { useContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
 import AuthContext from "../context/AuthContext"
 import Col from 'react-bootstrap/Col'
-import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form'
+import Container from 'react-bootstrap/Container'
+import Button from 'react-bootstrap/Button'
+import BatchesContext from "../context/BatchContext"
 
 
 const CreateBatch = () => {
-  const navigate = useNavigate()
   let {authTokens} = useContext(AuthContext)
-  let [labels, setLabels] = useState([])
+  let {labels, setUpdating} = useContext(BatchesContext)
+
   let [assays, setAssays] = useState([])
   let [rna, setRNA] = useState(true)
   let [dna, setDNA] = useState(true)
 
-  let getLabels = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/labels/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-    })
-    let data = await response.json()
-    if(response.status === 200) {
-      setLabels(data)
-      console.log(data)
-    } else {
-      alert('error')
-    }
-  }
-
   useEffect(() => {
-    getLabels()
     getAssays()
     // eslint-disable-next-line 
   }, [])
@@ -42,7 +24,7 @@ const CreateBatch = () => {
     e.preventDefault()
 
     let date = new Date()
-    let data = batchData(e)
+    let labelData = batchData(e)
     let selection = selectAssay(e)
     console.log(selection)
 
@@ -53,14 +35,17 @@ const CreateBatch = () => {
         'Authorization':'Bearer ' + String(authTokens.access)
       },
       body: JSON.stringify({
-        "assay": selection, "numberOfSamples": e.target.samples.value, 
-        "batchDate": date, "dna_extraction": e.target.dna.value === "" ? null : e.target.dna.value,
-        "rna_extraction": e.target.rna.value === "" ? null : e.target.rna.value, "fieldLabels": data
+        'assay': selection, 
+        'numberOfSamples': e.target.samples.value, 
+        'batchDate': date, 
+        'dna_extraction': e.target.dna.value === "" ? null : e.target.dna.value,
+        'rna_extraction': e.target.rna.value === "" ? null : e.target.rna.value, 
+        'fieldLabels': labelData
       })
     })
     if(response.status === 201) {
       console.log('batch created successfully')
-      navigate('/')
+      setUpdating(true)
     } else {
       alert('error')
     }
@@ -179,11 +164,19 @@ const CreateBatch = () => {
           </Form.Group>
           <Form.Group>
             <Form.Label>DNA Extraction Group</Form.Label>
-            <Form.Control id="dna_value" name="dna" type="text" required={dna===false ? true : false} placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} disabled={dna}/>
+            <Form.Control 
+              id="dna_value" name="dna" type="text" 
+              required={dna===false ? true : false} 
+              placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
+              disabled={dna}/>
           </Form.Group>
           <Form.Group>
             <Form.Label>RNA/Total-Nucleic Group</Form.Label>
-            <Form.Control id="rna_value" name="rna" type="text" required={dna===false ? true : false} placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} disabled={rna}/>
+            <Form.Control 
+              id="rna_value" name="rna" type="text" 
+              required={dna===false ? true : false} 
+              placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
+              disabled={rna}/>
           </Form.Group>
         
           <Form.Label>Additional Information</Form.Label>

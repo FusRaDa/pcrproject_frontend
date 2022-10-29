@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useContext } from 'react'
-import AuthContext from '../context/AuthContext'
+import React, { useContext, useState } from 'react'
 import BatchTable from '../components/BatchTable'
 import styled from 'styled-components'
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import CreateBatch from './CreateBatch';
+import BatchContext from '../context/BatchContext';
+import EditBatch from './EditBatch';
 
 const Styles = styled.div`
   padding: 1rem;
@@ -39,56 +44,18 @@ const Styles = styled.div`
 `
 
 const ListBatch = () => {
+  let {batches, labels} = useContext(BatchContext)
 
-  let [batches, setBatches] = useState([]) 
-  let {authTokens, logoutUser} = useContext(AuthContext)
-  let [labels, setLabels] = useState([])
-  
-  useEffect(() => {
-    getBatches()
-    getLabels()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  let [editing, setEditing] = useState(false)
+  let [pk, setPk] = useState(null)
 
-  let getBatches = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/batches/', {
-      method: 'GET',
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      }
-    })
-    let data = await response.json()
-    if(response.status === 200) {
-      setBatches(data)
-      console.log(data)
-    } else if (response.statusText === 'Unauthorized') {
-      logoutUser()
-    }
-  }
-
-  let getLabels = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/labels/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-    })
-    let data = await response.json()
-    if(response.status === 200) {
-      setLabels(data)
-    } else {
-      alert('error')
-    }
-  }
 
   //replace underscore with spaces for header column
   let spaceLabels = (string) => {
     return string.replace(/_+/g, ' ').trim()
   }
 
-  let createColumns = () => {
+  let createColumns = (labels) => {
     const columns = [
       {
         Header: 'pk',
@@ -122,10 +89,29 @@ const ListBatch = () => {
     return columns
   }
 
+  let getBatchPk = (pk) => {
+    console.log(pk)
+    setPk(pk)
+  } 
+
   return (
-    <Styles>
-      <BatchTable columns={createColumns()} data={batches} />
-    </Styles>
+    <Container>
+      <Row>
+        <Col>Master Sheet</Col>
+        <Col>Modify Batch</Col>
+      </Row>
+      <Row>
+        <Col>
+          <Styles>
+            <BatchTable columns={createColumns(labels)} data={batches} setEditing={setEditing} getBatchPk={getBatchPk}/>
+          </Styles>
+        </Col>
+        <Col>
+          {!editing && <CreateBatch />}
+          {editing && <EditBatch pk={pk} setEditing={setEditing}/>}
+        </Col>
+      </Row>
+    </Container>
   )
 }
 

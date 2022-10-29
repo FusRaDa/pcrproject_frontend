@@ -1,8 +1,7 @@
 import { useTable } from 'react-table'
-import { useNavigate } from "react-router-dom"
 
-const BatchTable = ({columns, data}) => {
-  const navigate = useNavigate()
+const BatchTable = ({columns, data, setEditing, getBatchPk}) => {
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -32,7 +31,7 @@ const BatchTable = ({columns, data}) => {
         {rows.map((row, i) => {
           prepareRow(row)
           return (
-            <tr {...row.getRowProps()} onClick={() => navigate(`/edit_batch/${row.values.pk}`)}>
+            <tr {...row.getRowProps()} onClick={() => {setEditing(true); getBatchPk(row.values.pk)}}>
               {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
               })}

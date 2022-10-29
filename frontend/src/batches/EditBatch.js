@@ -1,20 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import Form from 'react-bootstrap/Form';
+import BatchesContext from "../context/BatchContext";
+import Container from "react-bootstrap/esm/Container";
 
-const EditBatch = () => {
-  
-  const navigate = useNavigate()
-  const params = useParams()
-  let [batch, setBatch] = useState([])
+const EditBatch = ({pk, setEditing}) => {
+  //global
+  let {labels} = useContext(BatchesContext)
   let {authTokens} = useContext(AuthContext)
-  let [recieved, setRecieved] = useState(false)
-  let [assays, setAssays] = useState([])
-  let [labels, setLabels] = useState([])
 
+  //local
+  let [assays, setAssays] = useState([])
+  let [batch, setBatch] = useState([])
+  let [rna, setRNA] = useState(true)
+  let [dna, setDNA] = useState(true)
+ 
   let getBatch = async () => {
-    let response = await fetch(`http://127.0.0.1:8000/api/batches/${params.pk}/retrieve/`, {
+    let response = await fetch(`http://127.0.0.1:8000/api/batches/${pk}/retrieve/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +28,6 @@ const EditBatch = () => {
       console.log('batch retrieved')
       console.log(data)
       setBatch(data)
-      setRecieved(true)
     } else {
       alert('error')
     }
@@ -42,24 +43,9 @@ const EditBatch = () => {
     })
     let data = await response.json()
     if (response.status === 200) {
-      setAssays(data)
+      console.log('assays recieved')
       console.log(data)
-    } else {
-      alert('error')
-    }
-  }
-
-  let getLabels = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/labels/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-    })
-    let data = await response.json()
-    if(response.status === 200) {
-      setLabels(data)
+      setAssays(data)
     } else {
       alert('error')
     }
@@ -69,25 +55,30 @@ const EditBatch = () => {
     e.preventDefault()
     let selection = selectAssay(e)
     let labelData = batchData(e)
-    let response = await fetch(`http://127.0.0.1:8000/api/batches/${params.pk}/update/`, {
+    let response = await fetch(`http://127.0.0.1:8000/api/batches/${pk}/update/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       },
-      body: JSON.stringify({'assay':selection, 'numberOfSamples':e.target.numberOfSamples.value, fieldLabels: labelData})
+      body: JSON.stringify({
+        'assay':selection, 
+        'numberOfSamples':e.target.numberOfSamples.value,
+        'dna_extraction': e.target.dna.value === "" ? null : e.target.dna.value,
+        'rna_extraction': e.target.rna.value === "" ? null : e.target.rna.value,
+        'fieldLabels': labelData
+      })
     })
     let data = await response.json() 
     if(response.status === 200) {
       setBatch(data)
       console.log('batch updated')
-      navigate('/')
     } else {
       alert('error')
     }
-  }
+  } 
 
-  // gather data fro fieldLabels
+  // gather data from fieldLabels
   let batchData = (e) => {
     e.preventDefault()
     let keys = []
@@ -114,7 +105,7 @@ const EditBatch = () => {
   } 
 
   let deleteBatch = async () => {
-    let response = await fetch(`http://127.0.0.1:8000/api/batches/${params.pk}/destroy/`, {
+    let response = await fetch(`http://127.0.0.1:8000/api/batches/${pk}/destroy/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -123,57 +114,128 @@ const EditBatch = () => {
     })
     if(response.status === 204) {
       console.log('batch deleted')
-      navigate('/')
+      setEditing(false)
     } else {
       alert('error')
     }
   }
 
   useEffect(() => {
-    getLabels()
+    getBatch()
     getAssays()
-    getBatch(params.pk)
     // eslint-disable-next-line
   }, [])
- 
-  if (recieved) {
-    return (
-      <div>
-        Update Batch
-        <form onSubmit={updateBatch}>
-          <div>
-              <Form.Select name="assay" aria-label="Default select example">
-                <option value={batch.assay.pk}>{`${batch.assay.code}-${batch.assay.name}`}</option>
+
+  let chooseAssay = (e) => {
+    for (let i=0; i<assays.length; i++) {
+      //ignore eslint warning
+      // eslint-disable-next-line
+      if (assays[i].pk == e.target.value) {
+        disableExtractionGroup(assays[i])
+      }
+    }
+  }
+
+  let disableExtractionGroup = (chosenAssay) => {
+    //reset
+    setDNA(true)
+    setRNA(true)
+
+    //for single assay
+    if (chosenAssay.group.length === 0) {
+      if (chosenAssay.type === 'DNA') {
+        setDNA(false)
+        document.getElementById('rna_value').value=""
+      }
+      if (chosenAssay.type === 'RNA' || chosenAssay.type === 'Total nucleic') {
+        setRNA(false)
+        document.getElementById('dna_value').value=""
+      }
+    //for assays in a group
+    } else if (chosenAssay.group.length >= 0) {
+      let dna = false
+      let rna = false
+      for (let i=0; i<chosenAssay.group.length; i++) {
+        if (chosenAssay.group[i].type === 'DNA') {
+          dna = true
+        }
+        if (chosenAssay.group[i].type === 'RNA' || chosenAssay.group[i].type === 'Total nucleic') {
+          rna = true
+        }
+      }
+      if (dna) {
+        setDNA(false)
+        if (!rna) {
+          document.getElementById('rna_value').value=""
+        }
+      }
+      if (rna) {
+        setRNA(false)
+        if (!dna) {
+          document.getElementById('dna_value').value=""
+        }
+      }
+    }
+  }
+
+  return (
+    <Container>
+      <Col>
+        <Form onSubmit={updateBatch}>
+          <Form.Group>
+            <Form.Label>Assay Selected</Form.Label>
+              <Form.Select name="assay" aria-label="Default select example" onChange={chooseAssay} >
+                <option>{`${batch.assay.code}-${batch.assay.name}`}</option>
                 {assays
-                  .filter(assay => assay.name !== batch.assay.name)
+                  .filter(assay => assay.name !== batch.assay.name )
                   .map(assay => (
                   <option key={assay.pk} value={assay.pk}>{`${assay.code}-${assay.name}`}</option>
                 ))}
-              </Form.Select>
-          </div>
-          <div>
-            Number of Samples
-            <input type="text" name="numberOfSamples" defaultValue={batch.numberOfSamples}/>
-          </div>
-          {labels.map((label, index) => (
-          <div key={`info_${label.pk}`}>
-            {label.label}
-            <input
-              type="text"
-              name="info"
-              placeholder={`Enter ${label.label} Information`}
-              defaultValue={batch.fieldLabels === null ? "" : Object.values(batch.fieldLabels)[index]}
-            />
-          </div>
-          ))}
-          <input type="submit"/>
-        </form>
-        <div>
-          <button onClick={deleteBatch}>Delete</button>
-        </div>
-      </div>
-    )
-  }
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label>Number Of Samples</Form.Label>
+            <Form.Control name="samples" type="text" placeholder="Enter Number of Samples"/>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>DNA Extraction Group</Form.Label>
+            <Form.Control 
+              id="dna_value" name="dna" type="text" 
+              required={dna===false ? true : false} 
+              placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
+              disabled={dna}>
+                {batch.dna_extraction}
+              </Form.Control>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>RNA/Total-Nucleic Group</Form.Label>
+            <Form.Control 
+              id="rna_value" name="rna" type="text" 
+              required={dna===false ? true : false} 
+              placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
+              disabled={rna}>
+                {batch.rna_extraction}
+              </Form.Control>
+          </Form.Group>
+
+          <Form.Label>Additional Information</Form.Label>
+            {labels.map(label => (
+              <Form.Group key={`info_${label.pk}`}>
+                <Form.Control
+                  type="text"
+                  name="info"
+                  placeholder={`Enter ${label.label} Information`}
+                />
+              </Form.Group>
+            ))}
+          <Button type="submit" variant="primary">Update Batch</Button>
+        </Form>
+        <Button type="submit" variant="primary" onClick={deleteBatch}>Delete Batch</Button>
+      </Col>
+    </Container>
+  )
 }
+
 
 export default EditBatch
