@@ -12,11 +12,10 @@ const EditBatch = ({pk, setEditing}) => {
   let {authTokens} = useContext(AuthContext)
 
   //local
-  let [assays, setAssays] = useState([])
   let [batch, setBatch] = useState([])
+  let [recieved, setRecieved] = useState(false)
   let [rna, setRNA] = useState(true)
   let [dna, setDNA] = useState(true)
-  let [recieved, setRecieved] = useState(false)
 
 
   let getBatch = async () => {
@@ -38,26 +37,8 @@ const EditBatch = ({pk, setEditing}) => {
     }
   }
 
-  let getAssays = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/assays/', {
-      method: 'GET', 
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      }
-    })
-    let data = await response.json()
-    if (response.status === 200) {
-      console.log('assays recieved')
-      setAssays(data)
-    } else {
-      alert('error')
-    }
-  }
-
   let updateBatch = async (e) => {
     e.preventDefault()
-    let selection = selectAssay(e)
     let labelData = batchData(e)
     let response = await fetch(`http://127.0.0.1:8000/api/batches/${pk}/update/`, {
       method: 'PUT',
@@ -66,7 +47,7 @@ const EditBatch = ({pk, setEditing}) => {
         'Authorization':'Bearer ' + String(authTokens.access)
       },
       body: JSON.stringify({
-        'assay':selection, 
+        'assay':batch.assay, 
         'numberOfSamples':e.target.samples.value,
         'dna_extraction': e.target.dna.value === "" ? null : e.target.dna.value,
         'rna_extraction': e.target.rna.value === "" ? null : e.target.rna.value,
@@ -77,8 +58,8 @@ const EditBatch = ({pk, setEditing}) => {
     if(response.status === 200) {
       console.log('batch updated')
       setBatch(data)
-      setEditing(false)
-      setUpdating(true)
+      setEditing(false) //return back to create batch
+      setUpdating(true) //update table
     } else {
       alert('error')
     }
@@ -99,16 +80,6 @@ const EditBatch = ({pk, setEditing}) => {
     return data
   }
 
-  //gather data from selected assay
-  let selectAssay = (e) => {
-    for (let i=0; i<assays.length; i++) {
-      //ignore eslint warning
-      // eslint-disable-next-line
-      if (assays[i].pk == e.target.assay.value) {
-        return assays[i]
-      }
-    }
-  } 
 
   let deleteBatch = async () => {
     let response = await fetch(`http://127.0.0.1:8000/api/batches/${pk}/destroy/`, {
@@ -121,6 +92,7 @@ const EditBatch = ({pk, setEditing}) => {
     if(response.status === 204) {
       console.log('batch deleted')
       setEditing(false)
+      setUpdating(true)
     } else {
       alert('error')
     }
@@ -128,41 +100,19 @@ const EditBatch = ({pk, setEditing}) => {
 
   useEffect(() => {
     getBatch()
-    getAssays()
     // eslint-disable-next-line
   }, [])
 
-
-  //control accessibility of extraction group fields
-  let chooseAssay = (e) => {
-    for (let i=0; i<assays.length; i++) {
-      //ignore eslint warning
-      // eslint-disable-next-line
-      if (assays[i].pk == e.target.value) {
-        disableExtractionGroup(assays[i])
-      }
-    }
-  }
-
-  //control accessibility of extraction group fields
+  
   let disableExtractionGroup = (chosenAssay) => {
-    //reset
-    setDNA(true)
-    setRNA(true)
 
     //for single assay
     if (chosenAssay.group.length === 0) {
       if (chosenAssay.type === 'DNA') {
         setDNA(false)
-        if (document.getElementById('rna_input')) {
-          document.getElementById('rna_input').value = ''
-        }
       }
       if (chosenAssay.type === 'RNA' || chosenAssay.type === 'Total nucleic') {
         setRNA(false)
-        if (document.getElementById('dna_input')) {
-          document.getElementById('dna_input').value = ''
-        }
       }
     //for assays in a group
     } else if (chosenAssay.group.length >= 0) {
@@ -179,23 +129,16 @@ const EditBatch = ({pk, setEditing}) => {
       if (dna) {
         setDNA(false)
         if (!rna) {
-          if (document.getElementById('rna_input')) {
-            document.getElementById('rna_input').value = ''
-          }
         }
       }
       if (rna) {
         setRNA(false)
         if (!dna) {
-          if (document.getElementById('dna_input')) {
-            document.getElementById('dna_input').value = ''
-          }
         }
       }
     }
   }
 
- 
 
   if (recieved) {
     return (
@@ -204,14 +147,7 @@ const EditBatch = ({pk, setEditing}) => {
           <Form onSubmit={updateBatch}>
             <Form.Group>
               <Form.Label>Assay Selected</Form.Label>
-                <Form.Select name="assay" aria-label="Default select example" onChange={chooseAssay}>
-                  <option value={batch.assay.pk}>{`${batch.assay.code}-${batch.assay.name}`}</option>
-                  {assays
-                    .filter(assay => assay.name !== batch.assay.name )
-                    .map(assay => (
-                    <option key={assay.pk} value={assay.pk}>{`${assay.code}-${assay.name}`}</option>
-                  ))}
-              </Form.Select>
+                <Form.Control defaultValue={`${batch.assay.code}-${batch.assay.name}`} disabled/>
             </Form.Group>
   
             <Form.Group>

@@ -46,10 +46,24 @@ const CreateBatch = () => {
     if(response.status === 201) {
       console.log('batch created successfully')
       setUpdating(true)
+      resetInputs()
     } else {
       alert('error')
     }
   }
+
+  let resetInputs = () => {
+    document.getElementById('assay').value="Choose Assay"
+    document.getElementById('samples').value=""
+    setDNA(true)
+    setRNA(true)
+    document.getElementById('rna_value').value=""
+    document.getElementById('dna_value').value=""
+    labels.map(label => (
+      document.getElementById(`label_${label.pk}`).value=""
+    ))
+  }
+
 
   let selectAssay = (e) => {
     for (let i=0; i<assays.length; i++) {
@@ -151,7 +165,7 @@ const CreateBatch = () => {
         <Form onSubmit={addBatch}>
           <Form.Group>
             <Form.Label>Assay Selected</Form.Label>
-              <Form.Select name="assay" aria-label="Default select example" onChange={chooseAssay} >
+              <Form.Select id="assay" name="assay" aria-label="Default select example" onChange={chooseAssay} >
                 <option>Choose Assay</option>
                 {assays.map(assay => (
                   <option key={assay.pk} value={assay.pk}>{`${assay.code}-${assay.name}`}</option>
@@ -160,7 +174,7 @@ const CreateBatch = () => {
           </Form.Group>
           <Form.Group>
             <Form.Label>Number Of Samples</Form.Label>
-            <Form.Control name="samples" type="text" placeholder="Enter Number of Samples"/>
+            <Form.Control id="samples"  name="samples" type="text" placeholder="Enter Number of Samples"/>
           </Form.Group>
           <Form.Group>
             <Form.Label>DNA Extraction Group</Form.Label>
@@ -181,8 +195,9 @@ const CreateBatch = () => {
         
           <Form.Label>Additional Information</Form.Label>
           {labels.map(label => (
-            <Form.Group key={`info_${label.pk}`}>
+            <Form.Group key={label.pk}>
               <Form.Control
+                id={`label_${label.pk}`}
                 type="text"
                 name="info"
                 placeholder={`Enter ${label.label} Information`}

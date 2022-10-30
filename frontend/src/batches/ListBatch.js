@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import BatchTable from '../components/BatchTable'
 import styled from 'styled-components'
 import Container from 'react-bootstrap/Container';
@@ -89,23 +89,26 @@ const ListBatch = () => {
     return columns
   }
 
-  let getBatchPk = (pk) => {
-    setPk(pk)
-  } 
+  useEffect(() => {
+    if (pk !== null) {
+      setEditing(true)
+    } 
+  },[pk])
 
   return (
     <Container>
       <Row>
         <Col>Master Sheet</Col>
-        <Col>Modify Batch</Col>
+        <Col>Edit Labels</Col>
+        <Col onClick={() => setEditing(false)}>Create Batch</Col>
       </Row>
       <Row>
         <Col>
           <Styles>
-            <BatchTable columns={createColumns(labels)} data={batches} setEditing={setEditing} getBatchPk={getBatchPk}/>
+            <BatchTable columns={createColumns(labels)} data={batches} pk={pk} setPk={setPk} setEditing={setEditing}/>
           </Styles>
         </Col>
-        <Col>
+        <Col id='batch_screen'>
           {!editing && <CreateBatch />}
           {editing && <EditBatch pk={pk} setEditing={setEditing}/>}
         </Col>
