@@ -174,7 +174,7 @@ const CreateBatch = () => {
             <Form.Label>RNA/Total-Nucleic Group</Form.Label>
             <Form.Control 
               id="rna_value" name="rna" type="text" 
-              required={dna===false ? true : false} 
+              required={rna===false ? true : false} 
               placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
               disabled={rna}/>
           </Form.Group>

@@ -90,7 +90,6 @@ const ListBatch = () => {
   }
 
   let getBatchPk = (pk) => {
-    console.log(pk)
     setPk(pk)
   } 
 
