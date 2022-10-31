@@ -49,6 +49,9 @@ const ListBatch = () => {
   let [editing, setEditing] = useState(false)
   let [pk, setPk] = useState(null)
 
+  let [fullSheet, setFullSheet] = useState(true)
+  let [rowClicked, setRowClicked] = useState(null)
+
 
   //replace underscore with spaces for header column
   let spaceLabels = (string) => {
@@ -95,23 +98,34 @@ const ListBatch = () => {
     } 
   },[pk])
 
+  let resetSelections = () => {
+    setPk(null)
+    setRowClicked(null)
+  }
+
   return (
     <Container>
       <Row>
-        <Col>Master Sheet</Col>
+        <Col onClick={() => {setFullSheet(!fullSheet); resetSelections()}}>Master Sheet</Col>
         <Col>Edit Labels</Col>
-        <Col onClick={() => setEditing(false)}>Create Batch</Col>
+        <Col onClick={() => {setEditing(false); setFullSheet(false); resetSelections()}}>Create Batch</Col>
       </Row>
       <Row>
         <Col>
           <Styles>
-            <BatchTable columns={createColumns(labels)} data={batches} pk={pk} setPk={setPk} setEditing={setEditing}/>
+            <BatchTable 
+              columns={createColumns(labels)} 
+              data={batches} pk={pk} 
+              setPk={setPk} setEditing={setEditing} 
+              setFullSheet={setFullSheet}
+              rowClicked={rowClicked}
+              setRowClicked={setRowClicked}/>
           </Styles>
         </Col>
-        <Col id='batch_screen'>
+        {!fullSheet && <Col id='batch_screen'>
           {!editing && <CreateBatch />}
           {editing && <EditBatch pk={pk} setEditing={setEditing}/>}
-        </Col>
+        </Col>}
       </Row>
     </Container>
   )

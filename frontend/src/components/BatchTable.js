@@ -1,9 +1,6 @@
-import { useState } from 'react'
 import { useTable } from 'react-table'
 
-const BatchTable = ({columns, data, pk, setPk, setEditing}) => {
-
-  let [rowClicked, setRowClicked] = useState(null)
+const BatchTable = ({columns, data, pk, setPk, setEditing, setFullSheet, rowClicked, setRowClicked}) => {
 
   const {
     getTableProps,
@@ -41,7 +38,8 @@ const BatchTable = ({columns, data, pk, setPk, setEditing}) => {
                 setEditing(false)
               };
               //get pk from selected row
-              setPk(row.values.pk)}}>
+              setPk(row.values.pk); 
+              setFullSheet(false)}}>
               {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
               })}

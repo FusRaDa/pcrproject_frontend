@@ -3,8 +3,10 @@ import AuthContext from "../context/AuthContext"
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import Container from 'react-bootstrap/Container'
+import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button'
 import BatchesContext from "../context/BatchContext"
+import Row from 'react-bootstrap/Row';
 
 
 const CreateBatch = () => {
@@ -14,6 +16,9 @@ const CreateBatch = () => {
   let [assays, setAssays] = useState([])
   let [rna, setRNA] = useState(true)
   let [dna, setDNA] = useState(true)
+
+  let [groupList, setGroupList] = useState(false)
+  let [selectedAssay, setSelectedAssay] = useState(null)
 
   useEffect(() => {
     getAssays()
@@ -25,9 +30,7 @@ const CreateBatch = () => {
 
     let date = new Date()
     let labelData = batchData(e)
-    let selection = selectAssay(e)
-    console.log(selection)
-
+ 
     let response = await fetch('http://127.0.0.1:8000/api/batches/create/', {
       method: 'POST',
       headers: {
@@ -35,7 +38,7 @@ const CreateBatch = () => {
         'Authorization':'Bearer ' + String(authTokens.access)
       },
       body: JSON.stringify({
-        'assay': selection, 
+        'assay': selectedAssay, 
         'numberOfSamples': e.target.samples.value, 
         'batchDate': date, 
         'dna_extraction': e.target.dna.value === "" ? null : e.target.dna.value,
@@ -63,17 +66,6 @@ const CreateBatch = () => {
       document.getElementById(`label_${label.pk}`).value=""
     ))
   }
-
-
-  let selectAssay = (e) => {
-    for (let i=0; i<assays.length; i++) {
-      //ignore eslint warning
-      // eslint-disable-next-line
-      if (assays[i].pk == e.target.assay.value) {
-        return assays[i]
-      }
-    }
-  } 
 
   let getAssays = async () => {
     let response = await fetch('http://127.0.0.1:8000/api/assays/', {
@@ -106,11 +98,12 @@ const CreateBatch = () => {
     return data
   }
 
-  let chooseAssay = (e) => {
+  let chooseAssay = (pk) => {
     for (let i=0; i<assays.length; i++) {
       //ignore eslint warning
       // eslint-disable-next-line
-      if (assays[i].pk == e.target.value) {
+      if (assays[i].pk == pk) {
+        setSelectedAssay(assays[i])
         disableExtractionGroup(assays[i])
       }
     }
@@ -161,52 +154,88 @@ const CreateBatch = () => {
 
   return (
     <Container fluid="md">
-      <Col>
-        <Form onSubmit={addBatch}>
-          <Form.Group>
-            <Form.Label>Assay Selected</Form.Label>
-              <Form.Select id="assay" name="assay" aria-label="Default select example" onChange={chooseAssay} >
-                <option>Choose Assay</option>
-                {assays.map(assay => (
-                  <option key={assay.pk} value={assay.pk}>{`${assay.code}-${assay.name}`}</option>
-                ))}
-              </Form.Select>
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>Number Of Samples</Form.Label>
-            <Form.Control id="samples"  name="samples" type="text" placeholder="Enter Number of Samples"/>
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>DNA Extraction Group</Form.Label>
-            <Form.Control 
-              id="dna_value" name="dna" type="text" 
-              required={dna===false ? true : false} 
-              placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
-              disabled={dna}/>
-          </Form.Group>
-          <Form.Group>
-            <Form.Label>RNA/Total-Nucleic Group</Form.Label>
-            <Form.Control 
-              id="rna_value" name="rna" type="text" 
-              required={rna===false ? true : false} 
-              placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
-              disabled={rna}/>
-          </Form.Group>
-        
-          <Form.Label>Additional Information</Form.Label>
-          {labels.map(label => (
-            <Form.Group key={label.pk}>
-              <Form.Control
-                id={`label_${label.pk}`}
-                type="text"
-                name="info"
-                placeholder={`Enter ${label.label} Information`}
-              />
+      <Row>
+        <Col>
+          <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+            <Form.Group>
+              <Form.Label>Assay</Form.Label>
+              <Form.Control disabled value={selectedAssay === null ? "Select Assay" : `${selectedAssay.code}-${selectedAssay.name}`}/>
             </Form.Group>
+            <Form.Group>
+              <Form.Label>Number Of Samples</Form.Label>
+              <Form.Control id="samples"  name="samples" type="text" placeholder="Enter Number of Samples"/>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>DNA Extraction Group</Form.Label>
+              <Form.Control 
+                id="dna_value" name="dna" type="text" 
+                required={dna===false ? true : false} 
+                placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
+                disabled={dna}/>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>RNA/Total-Nucleic Group</Form.Label>
+              <Form.Control 
+                id="rna_value" name="rna" type="text" 
+                required={rna===false ? true : false} 
+                placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
+                disabled={rna}/>
+            </Form.Group>
+          
+            <Form.Label>Additional Information</Form.Label>
+            {labels.map(label => (
+              <Form.Group key={label.pk}>
+                <Form.Control
+                  id={`label_${label.pk}`}
+                  type="text"
+                  name="info"
+                  placeholder={`Enter ${label.label} Information`}
+                />
+              </Form.Group>
+              ))}
+            <Button type="submit" variant="primary">Create Batch</Button>
+          </Form>
+        </Col>
+
+        <Col>
+          {!groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+          {assays
+            .filter(assay => assay.group.length === 0)
+            .map(assay => (
+              <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
+                {assay.name}
+              </ListGroup.Item>
+          ))}
+          </ListGroup>}
+
+          {groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+          {assays
+            .filter(assay => assay.group.length > 1)
+            .map(assay => (
+              <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
+                {assay.name}
+              </ListGroup.Item>
+          ))}
+          </ListGroup>}
+          <Button onClick={() => setGroupList(!groupList)}>{groupList ? "View Single Assays" : "View Group Assays"}</Button>
+        </Col>
+
+        {selectedAssay !== null && <Col>
+         Assay Information
+         <Row>Name: {selectedAssay.name}</Row>
+         <Row>Code: {selectedAssay.code}</Row>
+         {selectedAssay.group.length > 1 && 
+          <Row>Grouped Assays: 
+            {selectedAssay.group.map(assay => (
+              <Row key={assay.pk}>
+                {`${assay.code}-${assay.name}`}
+              </Row>
             ))}
-          <Button type="submit" variant="primary">Create Batch</Button>
-        </Form>
-      </Col>
+          </Row>}
+
+        </Col>}
+
+      </Row>
     </Container>
   )
 }
