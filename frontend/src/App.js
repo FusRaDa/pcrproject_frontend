@@ -6,23 +6,21 @@ import Header from './components/Header'
 import React from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { provider, ProviderComposer } from './compose';
-import AssayPage from './pages/AssayPage';
-import CreateAssay from './assays/CreateAssay';
 import ListBatch from './batches/ListBatch';
-import { BatchesProvider } from './context/BatchContext';
+import { BatchProvider } from './context/BatchContext';
+import { AssayProvider } from './context/AssayContext';
+import ListAssay from './assays/ListAssay';
 
 function App() {
   return (
     <div className="App">
       <Router>
-        <ProviderComposer providers={[provider(AuthProvider), provider(BatchesProvider)]}>
+        <ProviderComposer providers={[provider(AuthProvider), provider(BatchProvider), provider(AssayProvider)]}>
           <Header/>
           <Routes>
             <Route element={<PrivateRoute/>}>
               <Route element={<ListBatch/>} path="/" exact />
-            
-              <Route element={<AssayPage/>} path="/assay" exact/>
-              <Route element={<CreateAssay/>} path="/assay/create_assay"/>
+              <Route element={<ListAssay/>} path="/assay" exact/>
             </Route>
             <Route element={<LoginPage/>} path="/login" />
           </Routes>

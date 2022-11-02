@@ -1,9 +1,13 @@
-import React, { useContext } from "react"
-import { useNavigate } from "react-router-dom"
+import React, { useContext, useState } from "react"
+import Container from "react-bootstrap/esm/Container"
+import Row from "react-bootstrap/Row"
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
+import ListGroup from 'react-bootstrap/ListGroup';
 import AuthContext from "../context/AuthContext"
+import Button from "react-bootstrap/Button";
 
-const CreateAssay = () => {
-  const navigate = useNavigate()
+const CreateAssay = ({isGroup, setIsGroup, addedAssays, setAddedAssays, pkArray, setPkArray}) => {
   let {authTokens} = useContext(AuthContext)
 
   let addAssay = async (e) => {
@@ -18,21 +22,55 @@ const CreateAssay = () => {
     })
     if(response.status === 201) {
       console.log('assay created successfully')
-      navigate('/assay')
     } else {
-      console.log(response)
       alert('error')
     }
   }
 
+
   return (
-    <div>
-      <form onSubmit={addAssay}>
-        <input type="text" name="name" placeholder="Enter Assay Name"/>
-        <input type="text" name="code" placeholder="Enter Assay Code"/>
-        <input type="submit"/>
-      </form>
-    </div>
+    <Container fluid="md">
+      <Row>
+        <Col>
+          <Button onClick={() => setIsGroup(!isGroup)}>{!isGroup ? "Create Group Assay" : "Create Individual Assay"}</Button>
+          <Form>
+            <Form.Group>
+              <Form.Label>{!isGroup ? "Individual Assay Name" : "Group Assay Name"}</Form.Label>
+              <Form.Control />
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>{!isGroup ? "Individual Assay Code" : "Group Assay Code"}</Form.Label>
+              <Form.Control />
+            </Form.Group>
+
+            {!isGroup && <Form.Group>
+              <Form.Label>Type</Form.Label>
+              <Form.Select>
+                <option>Choose Sample Type</option>
+                <option>DNA</option>
+                <option>RNA</option>
+                <option>Total nucleic</option>
+              </Form.Select>
+            </Form.Group>}
+          </Form>
+
+
+          {isGroup && <ListGroup>
+            <Form.Label>Assays in Group </Form.Label>
+            {addedAssays.map(assay => (
+              <ListGroup.Item>{`${assay.code}-${assay.name}`}</ListGroup.Item>
+            ))}
+          </ListGroup>}
+
+
+
+
+
+         
+        </Col>
+      </Row>
+    </Container>
   )
 }
 

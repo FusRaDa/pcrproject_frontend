@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import AuthContext from './AuthContext'
 
-const BatchesContext = createContext()
+const BatchContext = createContext()
 
-export default BatchesContext
+export default BatchContext
 
-export const BatchesProvider = ({children}) => {
+export const BatchProvider = ({children}) => {
 
   let {authTokens, logoutUser} = useContext(AuthContext)
   let [batches, setBatches] = useState([])
@@ -61,9 +61,9 @@ export const BatchesProvider = ({children}) => {
   }
 
   return (
-    <BatchesContext.Provider value={contextData}>
+    <BatchContext.Provider value={contextData}>
       {children}
-    </BatchesContext.Provider>
+    </BatchContext.Provider>
   )
 
 }

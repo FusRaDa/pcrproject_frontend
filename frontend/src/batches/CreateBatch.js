@@ -1,29 +1,25 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useState } from "react"
 import AuthContext from "../context/AuthContext"
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import Container from 'react-bootstrap/Container'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button'
-import BatchesContext from "../context/BatchContext"
-import Row from 'react-bootstrap/Row';
+import BatchContext from "../context/BatchContext"
+import Row from 'react-bootstrap/Row'
+import AssayContext from "../context/AssayContext"
 
 
 const CreateBatch = () => {
   let {authTokens} = useContext(AuthContext)
-  let {labels, setUpdating} = useContext(BatchesContext)
+  let {labels, setUpdating} = useContext(BatchContext)
+  let {assays} = useContext(AssayContext)
 
-  let [assays, setAssays] = useState([])
   let [rna, setRNA] = useState(true)
   let [dna, setDNA] = useState(true)
 
   let [groupList, setGroupList] = useState(false)
   let [selectedAssay, setSelectedAssay] = useState(null)
-
-  useEffect(() => {
-    getAssays()
-    // eslint-disable-next-line 
-  }, [])
 
   let addBatch = async (e) => {
     e.preventDefault()
@@ -65,23 +61,6 @@ const CreateBatch = () => {
     labels.map(label => (
       document.getElementById(`label_${label.pk}`).value=""
     ))
-  }
-
-  let getAssays = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/assays/', {
-      method: 'GET', 
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      }
-    })
-    let data = await response.json()
-    if (response.status === 200) {
-      setAssays(data)
-      console.log(data)
-    } else {
-      alert('error')
-    }
   }
 
   let batchData = (e) => {
