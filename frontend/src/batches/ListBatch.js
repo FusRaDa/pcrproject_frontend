@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { useNavigate } from "react-router-dom"
 import BatchTable from '../components/BatchTable'
 import styled from 'styled-components'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import CreateBatch from './CreateBatch';
 import BatchContext from '../context/BatchContext';
 import EditBatch from './EditBatch';
 
@@ -44,13 +44,13 @@ const Styles = styled.div`
 `
 
 const ListBatch = () => {
+  const navigate = useNavigate()
   let {batches, labels} = useContext(BatchContext)
 
   let [editing, setEditing] = useState(false)
-  let [pk, setPk] = useState(null)
-
   let [fullSheet, setFullSheet] = useState(true)
   let [rowClicked, setRowClicked] = useState(null)
+  let [selectedBatch, setSelectedBatch] = useState(null)
 
 
   //replace underscore with spaces for header column
@@ -93,13 +93,12 @@ const ListBatch = () => {
   }
 
   useEffect(() => {
-    if (pk !== null) {
+    if (selectedBatch !== null) {
       setEditing(true)
     } 
-  },[pk])
+  },[selectedBatch])
 
   let resetSelections = () => {
-    setPk(null)
     setRowClicked(null)
   }
 
@@ -108,23 +107,24 @@ const ListBatch = () => {
       <Row>
         <Col onClick={() => {setFullSheet(!fullSheet); resetSelections()}}>Master Sheet</Col>
         <Col>Edit Labels</Col>
-        <Col onClick={() => {setEditing(false); setFullSheet(false); resetSelections()}}>Create Batch</Col>
+        <Col onClick={() => navigate('/create')}>Create Batch</Col>
       </Row>
       <Row>
         <Col>
           <Styles>
             <BatchTable 
               columns={createColumns(labels)} 
-              data={batches} pk={pk} 
-              setPk={setPk} setEditing={setEditing} 
+              data={batches} 
+              selectedBatch={selectedBatch}
+              setSelectedBatch={setSelectedBatch}
+              setEditing={setEditing} 
               setFullSheet={setFullSheet}
               rowClicked={rowClicked}
               setRowClicked={setRowClicked}/>
           </Styles>
         </Col>
         {!fullSheet && <Col id='batch_screen'>
-          {!editing && <CreateBatch />}
-          {editing && <EditBatch pk={pk} setEditing={setEditing}/>}
+          {editing && <EditBatch selectedBatch={selectedBatch} setEditing={setEditing}/>}
         </Col>}
       </Row>
     </Container>

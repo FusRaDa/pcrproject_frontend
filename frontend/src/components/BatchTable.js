@@ -1,6 +1,6 @@
 import { useTable } from 'react-table'
 
-const BatchTable = ({columns, data, pk, setPk, setEditing, setFullSheet, rowClicked, setRowClicked}) => {
+const BatchTable = ({columns, data, setSelectedBatch, setFullSheet, rowClicked, setRowClicked}) => {
 
   const {
     getTableProps,
@@ -32,13 +32,8 @@ const BatchTable = ({columns, data, pk, setPk, setEditing, setFullSheet, rowClic
           prepareRow(row)
           return (
             <tr {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}} onClick={() => {
-              setRowClicked(i)
-              //if pk is different reset editing - prevent from going to CreateBatch.js
-              if (pk !== row.values.pk) {
-                setEditing(false)
-              };
-              //get pk from selected row
-              setPk(row.values.pk); 
+              setRowClicked(i);
+              setSelectedBatch(row.original);
               setFullSheet(false)}}>
               {row.cells.map(cell => {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>

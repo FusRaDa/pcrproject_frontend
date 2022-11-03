@@ -1,4 +1,6 @@
 import React, { useContext, useState } from "react"
+import { useNavigate } from "react-router-dom"
+
 import AuthContext from "../context/AuthContext"
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
@@ -20,6 +22,10 @@ const CreateBatch = () => {
 
   let [groupList, setGroupList] = useState(false)
   let [selectedAssay, setSelectedAssay] = useState(null)
+
+  let [search, setSearch] = useState("")
+
+  const navigate = useNavigate()
 
   let addBatch = async (e) => {
     e.preventDefault()
@@ -45,22 +51,11 @@ const CreateBatch = () => {
     if(response.status === 201) {
       console.log('batch created successfully')
       setUpdating(true)
-      resetInputs()
+      navigate('/')
+      
     } else {
       alert('error')
     }
-  }
-
-  let resetInputs = () => {
-    document.getElementById('assay').value="Choose Assay"
-    document.getElementById('samples').value=""
-    setDNA(true)
-    setRNA(true)
-    document.getElementById('rna_value').value=""
-    document.getElementById('dna_value').value=""
-    labels.map(label => (
-      document.getElementById(`label_${label.pk}`).value=""
-    ))
   }
 
   let batchData = (e) => {
@@ -130,90 +125,93 @@ const CreateBatch = () => {
     }
   }
 
+  let searchAssay = () => {
+    let data = document.getElementById('search').value
+    setSearch(data.toLowerCase())
+  }
 
   return (
     <Container fluid="md">
       <Row>
         <Col>
-          <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
-            <Form.Group>
-              <Form.Label>Assay</Form.Label>
-              <Form.Control disabled value={selectedAssay === null ? "Select Assay" : `${selectedAssay.code}-${selectedAssay.name}`}/>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Number Of Samples</Form.Label>
-              <Form.Control id="samples"  name="samples" type="text" placeholder="Enter Number of Samples"/>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>DNA Extraction Group</Form.Label>
-              <Form.Control 
-                id="dna_value" name="dna" type="text" 
-                required={dna===false ? true : false} 
-                placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
-                disabled={dna}/>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>RNA/Total-Nucleic Group</Form.Label>
-              <Form.Control 
-                id="rna_value" name="rna" type="text" 
-                required={rna===false ? true : false} 
-                placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
-                disabled={rna}/>
-            </Form.Group>
-          
-            <Form.Label>Additional Information</Form.Label>
-            {labels.map(label => (
-              <Form.Group key={label.pk}>
-                <Form.Control
-                  id={`label_${label.pk}`}
-                  type="text"
-                  name="info"
-                  placeholder={`Enter ${label.label} Information`}
-                />
+          <Container>
+            <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+              <Form.Group>
+                <Form.Label>Assay</Form.Label>
+                <Form.Control disabled value={selectedAssay === null ? "Select Assay" : `${selectedAssay.code}-${selectedAssay.name}`}/>
               </Form.Group>
-              ))}
-            <Button type="submit" variant="primary">Create Batch</Button>
-          </Form>
-        </Col>
+              <Form.Group>
+                <Form.Label>Number Of Samples</Form.Label>
+                <Form.Control id="samples"  name="samples" type="text" placeholder="Enter Number of Samples"/>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>DNA Extraction Group</Form.Label>
+                <Form.Control 
+                  id="dna_value" name="dna" type="text" 
+                  required={dna===false ? true : false} 
+                  placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
+                  disabled={dna}/>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>RNA/Total-Nucleic Group</Form.Label>
+                <Form.Control 
+                  id="rna_value" name="rna" type="text" 
+                  required={rna===false ? true : false} 
+                  placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
+                  disabled={rna}/>
+              </Form.Group>
+            
+              <Form.Label>Additional Information</Form.Label>
+              {labels.map(label => (
+                <Form.Group key={label.pk}>
+                  <Form.Control
+                    id={`label_${label.pk}`}
+                    type="text"
+                    name="info"
+                    placeholder={`Enter ${label.label} Information`}
+                  />
+                </Form.Group>
+                ))}
+              <Button type="submit" variant="primary">Create Batch</Button>
+            </Form>
+            </Container>
+          </Col>
 
-        <Col>
-          {!groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
-          {assays
-            .filter(assay => assay.group.length === 0)
-            .map(assay => (
-              <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
-                {assay.name}
-              </ListGroup.Item>
-          ))}
-          </ListGroup>}
+          <Col>
+          <Container>
+          <Button onClick={() => setGroupList(!groupList)}>{groupList ? "View Individual Assays" : "View Group Assays"}</Button>
+            <Form className="d-flex" onChange={() => searchAssay()}>
+              <Form.Control
+                type="search"
+                placeholder={!groupList ? "Search for Individual Assays" : "Search for Group Assays"}
+                id="search"
+              />
+            </Form>
 
-          {groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
-          {assays
-            .filter(assay => assay.group.length > 1)
-            .map(assay => (
-              <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
-                {assay.name}
-              </ListGroup.Item>
-          ))}
-          </ListGroup>}
-          <Button onClick={() => setGroupList(!groupList)}>{groupList ? "View Single Assays" : "View Group Assays"}</Button>
-        </Col>
-
-        {selectedAssay !== null && <Col>
-         Assay Information
-         <Row>Name: {selectedAssay.name}</Row>
-         <Row>Code: {selectedAssay.code}</Row>
-         {selectedAssay.group.length > 1 && 
-          <Row>Grouped Assays: 
-            {selectedAssay.group.map(assay => (
-              <Row key={assay.pk}>
-                {`${assay.code}-${assay.name}`}
-              </Row>
+            {!groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+            {assays
+              .filter(assay => assay.group.length === 0)
+              .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
+              .map(assay => (
+                <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
+                  {assay.name}
+                </ListGroup.Item>
             ))}
-          </Row>}
+            </ListGroup>}
 
-        </Col>}
-
+            {groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+            {assays
+              .filter(assay => assay.group.length > 1)
+              .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
+              .map(assay => (
+                <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
+                  {assay.name}
+                </ListGroup.Item>
+            ))}
+            </ListGroup>}
+          </Container>
+        </Col>
+        
       </Row>
     </Container>
   )

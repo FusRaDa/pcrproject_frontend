@@ -1,32 +1,26 @@
-import React, { useState, useContext, useRef} from 'react'
+import React, { useState, useContext} from 'react'
+import { useNavigate } from "react-router-dom"
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
-import Container from "react-bootstrap/esm/Container";
-import ListGroup from 'react-bootstrap/ListGroup';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
-import Button from 'react-bootstrap/esm/Button';
+import Container from "react-bootstrap/esm/Container"
+import ListGroup from 'react-bootstrap/ListGroup'
+import Button from 'react-bootstrap/esm/Button'
+import Card from 'react-bootstrap/Card';
 
 import AssayContext from '../context/AssayContext'
-import CreateAssay from './CreateAssay';
-
 
 const ListAssay = () => {
 
   //global
   let {assays} = useContext(AssayContext)
 
-  //child - CreateAssay.js
-  let [isGroup, setIsGroup] = useState(false)
-  let [addedAssays, setAddedAssays] = useState([])
-  let [pkArray, setPkArray] = useState([])
-
   //local
   let [groupAssays, setGroupAssays] = useState(false)
-  // let [viewAssay, setViewAssay] = useState(null)
   let [search, setSearch] = useState("")
-  let [createAssay, setCreateAssay] = useState(false)
+  let [assay, setAssay] = useState(null)
+
+  const navigate = useNavigate()
 
   // let chooseAssay = (pk) => {
   //   for (let i=0; i<assays.length; i++) {
@@ -38,28 +32,6 @@ const ListAssay = () => {
   //   }
   // }
 
-  let controlAssaySelection = (assay) => {
-    if (document.getElementById(`${assay.pk}`).checked) {
-      console.log('add')
-    } else {
-      console.log('remove')
-    }
-  }
-
-  let addAssayToGroup = (assay) => {
-    setAddedAssays(addedAssays.push(assay))
-    setPkArray(pkArray.push(assay.pk))
-  }
-
-  let removeAssayFromGroup = (assay) => {
-    for (var i=0; i < addedAssays; i++) {
-      if (addedAssays[i].pk === assay.pk) {
-        setAddedAssays(addedAssays.splice(i, 1))
-        setPkArray(pkArray.splice(i, 1))
-      }
-    }
-  }
-
   let searchAssay = () => {
     let data = document.getElementById('search').value
     setSearch(data.toLowerCase())
@@ -69,61 +41,97 @@ const ListAssay = () => {
     <Container fluid="md">
       <Row>
         <Col>
-          <Form.Label>{!groupAssays ? "Individual Assays" : "Group Assays"}</Form.Label>
-          <Button onClick={() => setCreateAssay(!createAssay)}>Create Assay</Button>
-
-          <Form className="d-flex" onChange={() => searchAssay()}>
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              id="search"
-            />
-            <Button type="submit" variant="outline-success">Search</Button>
+          <Container>
+      
             <Button onClick={() => setGroupAssays(!groupAssays)}>{!groupAssays ? "View Group Assays" : "View Individual Assays"}</Button>
-          </Form>
+            <Button onClick={() => navigate('/assay/create')}>Create Assay</Button>
 
+            <Form className="d-flex" onChange={() => searchAssay()}>
+              <Form.Control
+                type="search"
+                placeholder={!groupAssays ? "Search for Individual Assays" : "Search for Group Assays"}
+                id="search"
+              />
+            </Form>
 
+            {!groupAssays && 
+            <ListGroup>
+              {assays
+                //allow assays clicked to be edited/details and added to group assay
+                .filter(assay => assay.group.length === 0)
+                .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
+                .map(assay => (
+                  <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => setAssay(assay)}>
+                    {`${assay.code}-${assay.name}`}
+                  </ListGroup.Item>
+                ))}
+            </ListGroup>}
 
-
-          {!groupAssays && <ListGroup>
+            {groupAssays && <ListGroup>
             {assays
-              //allow assays clicked to be edited/details and added to group assay
-              .filter(assay => assay.group.length === 0)
+              .filter(assay => assay.group.length > 1)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
-                <ListGroup.Item key={assay.pk}>
+                <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => setAssay(assay)}>
                   {`${assay.code}-${assay.name}`}
-                  {isGroup && <ToggleButtonGroup type="checkbox" defaultValue={pkArray} onChange={(e) => controlAssaySelection(assay)}>
-                    <ToggleButton id={assay.pk} value={assay.pk} onChange={(e) => console.log(e.target.checked)}>
-                      CHANGE TEXT
-                    </ToggleButton>
-                  </ToggleButtonGroup>}
                 </ListGroup.Item>
-              ))}
-          </ListGroup>}
-
-
-
-          {groupAssays && <ListGroup>
-          {assays
-            .filter(assay => assay.group.length > 1)
-            .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
-            .map(assay => (
-              <ListGroup.Item key={assay.pk}>
-                {`${assay.code}-${assay.name}`}
-              </ListGroup.Item>
-          ))}
-          </ListGroup>}
+            ))}
+            </ListGroup>}
+          </Container>
         </Col>
-        
-    
-        {createAssay && <Col>
-          <CreateAssay 
-            isGroup={isGroup} setIsGroup={setIsGroup} 
-            addedAssays={addedAssays} setAddedAssays={setAddedAssays}
-            pkArray={pkArray} setPkArray={setPkArray}/>
 
-        </Col>}
+        <Col>
+          <Container>
+
+            {assay !== null && 
+            <Card border="secondary">
+              <Card.Header>Assay Details</Card.Header>
+              <ListGroup>
+                <ListGroup.Item>Name: {assay.name}</ListGroup.Item>
+                <ListGroup.Item>Code: {assay.code}</ListGroup.Item>
+                <ListGroup.Item>Type: {assay.type}</ListGroup.Item>
+                  {assay.group.length > 1 && 
+                  <ListGroup>
+                    Grouped Assays
+                    {assay.group.map(a => (
+                      <ListGroup.Item key={a.pk}>
+                        {a.name}
+                      </ListGroup.Item>))}
+                  </ListGroup>}
+
+                  {!groupAssays && 
+                  <ListGroup>
+                    Reagents
+                    {assay.reagent.map(r => (
+                      <ListGroup.Item key={r.pk}>
+                        {r.name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>}
+
+                  {!groupAssays && 
+                  <ListGroup>
+                    Supplies
+                    {assay.supply.map(s => (
+                      <ListGroup.Item key={s.pk}>
+                        {s.name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>}
+              </ListGroup>
+              <Button>Edit this Assay</Button>
+            </Card>}
+
+            {assay === null && 
+            <Card border="secondary">
+              <Card.Header>Assay Details</Card.Header>
+              <Card.Text>
+                Choose an assay to view details
+              </Card.Text>
+            </Card>}
+
+          </Container>
+        </Col>
       </Row>
     </Container>
   )
