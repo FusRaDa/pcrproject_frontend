@@ -32,6 +32,7 @@ const BatchTable = ({columns, data, setSelectedBatch, setFullSheet, rowClicked, 
           prepareRow(row)
           return (
             <tr {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}} onClick={() => {
+              console.log(row.original)
               setRowClicked(i);
               setSelectedBatch(row.original);
               setFullSheet(false)}}>

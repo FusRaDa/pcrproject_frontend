@@ -34,7 +34,14 @@ const CreateAssay = () => {
         'Content-Type': 'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       },
-      body: JSON.stringify({'name':e.target.name.value, 'code':e.target.code.value})
+      body: JSON.stringify({
+        'name': e.target.name.value, 
+        'code': e.target.code.value, 
+        'type': e.target.type.value !== undefined ? e.target.type.value : null,
+        'reagent': null,
+        'supply': null, 
+        'assays' : addedAssays
+      })
     })
     if(response.status === 201) {
       console.log('assay created successfully')
@@ -56,18 +63,18 @@ const CreateAssay = () => {
             <Button onClick={() => setIndividual(!individual)}>{individual ? "Create Group Assay" : "Create Individual Assay"}</Button>
 
             {individual && 
-            <Form>
+            <Form onSubmit={addAssay}>
               <Form.Group>
                 <Form.Label>Assay Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter name of assay" />
+                <Form.Control name="name" type="text" placeholder="Enter name of assay" />
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Code</Form.Label>
-                <Form.Control type="text" placeholder="Enter code of assay" />
+                <Form.Control name="code" type="text" placeholder="Enter code of assay" />
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Type</Form.Label>
-                <Form.Select>
+                <Form.Select name="type">
                   <option>Select Type</option>
                   <option>DNA</option>
                   <option>RNA</option>
@@ -75,17 +82,18 @@ const CreateAssay = () => {
                 </Form.Select>
                 Refer to a list of reagents and supplies and add to assay
               </Form.Group>
+              <Button type="submit">Add Assay</Button>
             </Form>}
 
             {!individual && 
-            <Form>
+            <Form onSubmit={addAssay}>
               <Form.Group>
                 <Form.Label>Assay Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter name of assay" />
+                <Form.Control name="name" type="text" placeholder="Enter name of assay" />
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Code</Form.Label>
-                <Form.Control type="text" placeholder="Enter code of assay" />
+                <Form.Control name="code" type="text" placeholder="Enter code of assay" />
               </Form.Group>
               <ListGroup>
                 {addedAssays.length > 0 ? "Grouped Assays" : null}
@@ -95,10 +103,9 @@ const CreateAssay = () => {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
-
-
-
+              <Button type="submit">Add Assay</Button>
             </Form>}
+
           </Container>
         </Col>
 
@@ -118,7 +125,7 @@ const CreateAssay = () => {
             <ListGroup>
               {assays
                 //allow assays clicked to be edited/details and added to group assay
-                .filter(assay => assay.group.length === 0)
+                .filter(assay => assay.assays.length === 0)
                 .filter(assay => !addedAssays.includes(assay))
                 .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
                 .map(assay => (

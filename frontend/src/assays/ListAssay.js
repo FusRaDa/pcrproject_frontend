@@ -58,7 +58,7 @@ const ListAssay = () => {
             <ListGroup>
               {assays
                 //allow assays clicked to be edited/details and added to group assay
-                .filter(assay => assay.group.length === 0)
+                .filter(assay => assay.assays.length === 0)
                 .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
                 .map(assay => (
                   <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => setAssay(assay)}>
@@ -69,7 +69,7 @@ const ListAssay = () => {
 
             {groupAssays && <ListGroup>
             {assays
-              .filter(assay => assay.group.length > 1)
+              .filter(assay => assay.assays.length > 1)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
                 <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => setAssay(assay)}>
@@ -90,10 +90,10 @@ const ListAssay = () => {
                 <ListGroup.Item>Name: {assay.name}</ListGroup.Item>
                 <ListGroup.Item>Code: {assay.code}</ListGroup.Item>
                 <ListGroup.Item>Type: {assay.type}</ListGroup.Item>
-                  {assay.group.length > 1 && 
+                  {assay.assays.length > 1 && 
                   <ListGroup>
                     Grouped Assays
-                    {assay.group.map(a => (
+                    {assay.assays.map(a => (
                       <ListGroup.Item key={a.pk}>
                         {a.name}
                       </ListGroup.Item>))}
@@ -119,7 +119,7 @@ const ListAssay = () => {
                     ))}
                   </ListGroup>}
               </ListGroup>
-              <Button>Edit this Assay</Button>
+              <Button onClick={() => navigate(`/assay/edit/${assay.pk}`, {state: {assay:assay}})}>Edit this Assay</Button>
             </Card>}
 
             {assay === null && 

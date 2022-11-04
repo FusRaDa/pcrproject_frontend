@@ -25,8 +25,8 @@ const EditBatch = ({selectedBatch, setEditing}) => {
       body: JSON.stringify({
         'assay':selectedBatch.assay, 
         'numberOfSamples':e.target.samples.value,
-        'dna_extraction': e.target.dna.value === "" ? null : e.target.dna.value,
-        'rna_extraction': e.target.rna.value === "" ? null : e.target.rna.value,
+        'dna_extraction': e.target.dna.value,
+        'rna_extraction': e.target.rna.value,
         'fieldLabels': labelData
       })
     })

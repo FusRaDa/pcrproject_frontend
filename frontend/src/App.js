@@ -12,6 +12,7 @@ import { AssayProvider } from './context/AssayContext';
 import ListAssay from './assays/ListAssay';
 import CreateAssay from './assays/CreateAssay';
 import CreateBatch from './batches/CreateBatch';
+import EditAssay from './assays/EditAssay';
 
 function App() {
   return (
@@ -21,10 +22,13 @@ function App() {
           <Header/>
           <Routes>
             <Route element={<PrivateRoute/>}>
+
               <Route element={<ListBatch/>} path="/" exact />
               <Route element={<CreateBatch/>} path="/create" exact/>
+
               <Route element={<ListAssay/>} path="/assay" exact/>
               <Route element={<CreateAssay/>} path="/assay/create" exact/>
+              <Route element={<EditAssay/>} path="/assay/edit/:pk" exact/>
 
             </Route>
             <Route element={<LoginPage/>} path="/login" />
