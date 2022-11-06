@@ -52,46 +52,59 @@ const ListBatch = () => {
   let [rowClicked, setRowClicked] = useState(null)
   let [selectedBatch, setSelectedBatch] = useState(null)
 
+  let [labelData, setLabelData] = useState([])
 
   //replace underscore with spaces for header column
   let spaceLabels = (string) => {
     return string.replace(/_+/g, ' ').trim()
   }
 
-  let createColumns = (labels) => {
-    const columns = [
-      {
-        Header: 'pk',
-        accessor: 'pk'
-      },
-      {
-        Header: 'Assay',
-        accessor: 'assay.name'
-      },
-      {
-        Header: 'Code',
-        accessor: 'assay.code'
-      },
-      {
-        Header: '# of Samples',
-        accessor: 'numberOfSamples'
-      },
-      {
-        Header: 'DNA Extraction Group',
-        accessor: 'dna_extraction'
-      },
-      {
-        Header: 'RNA/Total-Nucleic Extraction Group',
-        accessor: 'rna_extraction'
-      }
-    ]
-
-    labels.forEach(label => {
-      columns.push({Header: `${spaceLabels(label.label)}`, accessor: `fieldLabels.${label.label}`})
+  useEffect(() => {
+    let data = labels.map(label => {
+      return {Header: `${spaceLabels(label.label)}`, accessor: `fieldLabels.${label.label}`}
     })
+    setLabelData(data)
+  }, [labels])
+
+  let renderColumns = () => {
+    let columns = [
+      {
+        Header: 'Batch Info',
+        columns: [
+          {
+            Header: 'pk',
+            accessor: 'pk'
+          },
+          {
+            Header: 'Assay',
+            accessor: 'assay.name',
+          },
+          {
+            Header: 'Code',
+            accessor: 'assay.code'
+          },
+          {
+            Header: '# of Samples',
+            accessor: 'numberOfSamples'
+          },
+          {
+            Header: 'DNA Extraction Group',
+            accessor: 'dna_extraction'
+          },
+          {
+            Header: 'RNA/Total-Nucleic Extraction Group',
+            accessor: 'rna_extraction'
+          }
+        ],
+      },
+      {
+        Header: 'Additional Info',
+        columns: labelData
+      },
+    ]
     return columns
   }
-
+ 
   useEffect(() => {
     if (selectedBatch !== null) {
       setEditing(true)
@@ -113,7 +126,7 @@ const ListBatch = () => {
         <Col>
           <Styles>
             <BatchTable 
-              columns={createColumns(labels)} 
+              columns={renderColumns()} 
               data={batches} 
               selectedBatch={selectedBatch}
               setSelectedBatch={setSelectedBatch}
@@ -123,7 +136,9 @@ const ListBatch = () => {
               setRowClicked={setRowClicked}/>
           </Styles>
         </Col>
-        {!fullSheet && <Col id='batch_screen'>
+
+        {!fullSheet && 
+        <Col id='batch_screen'>
           {editing && <EditBatch selectedBatch={selectedBatch} setEditing={setEditing}/>}
         </Col>}
       </Row>

@@ -1,6 +1,32 @@
-import { useTable } from 'react-table'
+import { useMemo } from 'react'
+import { useTable, useFilters, useGlobalFilter } from 'react-table'
+import DefaultColumnFilter from './DefaultColumnFilter'
+import FuzzyTextFilterFn from './FuzzyTextFilterFn'
+
+
+FuzzyTextFilterFn.autoRemove = val => !val
 
 const BatchTable = ({columns, data, setSelectedBatch, setFullSheet, rowClicked, setRowClicked}) => {
+
+  const filterTypes = useMemo(() => ({
+      // Add a new fuzzyTextFilterFn filter type.
+      fuzzyText: FuzzyTextFilterFn,
+      // Or, override the default text filter to use
+      // "startWith"
+      text: (rows, id, filterValue) => {
+        return rows.filter(row => {
+          const rowValue = row.values[id]
+          return rowValue !== undefined
+            ? String(rowValue)
+                .toLowerCase()
+                .startsWith(String(filterValue).toLowerCase())
+            : true
+        })},
+      }), [])
+
+  const defaultColumn = useMemo(() => ({
+    Filter: DefaultColumnFilter
+  }), [])
 
   const {
     getTableProps,
@@ -8,31 +34,46 @@ const BatchTable = ({columns, data, setSelectedBatch, setFullSheet, rowClicked, 
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({
-    columns,
-    data,
-    initialState: {
-      hiddenColumns: ['pk']
-    }
-  })
+    state,
+  } = useTable(
+    {
+      columns,
+      data,
+      defaultColumn,
+      filterTypes,
+      initialState: {
+        hiddenColumns: ['pk']
+        },
+    },
+    useFilters,
+    useGlobalFilter,
+  )
+
+  //limit number of rows shown to 10
+  const firstPageRows = rows.slice(0, 10)
 
   return (
+    <>
     <table {...getTableProps()}>
       <thead>
         {headerGroups.map(headerGroup => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+              <th {...column.getHeaderProps()}>
+                {column.render('Header')}
+                {/*Render the columns filter UI */}
+                <div>{column.canFilter ? column.render('Filter') : null}</div>
+                </th>
             ))}
           </tr>
         ))}
       </thead>
+
       <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
+        {firstPageRows.map((row, i) => {
           prepareRow(row)
           return (
             <tr {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}} onClick={() => {
-              console.log(row.original)
               setRowClicked(i);
               setSelectedBatch(row.original);
               setFullSheet(false)}}>
@@ -44,6 +85,15 @@ const BatchTable = ({columns, data, setSelectedBatch, setFullSheet, rowClicked, 
         })}
       </tbody>
     </table>
+    
+    <br />
+    <div>Showing the first 20 results of {rows.length} rows</div>
+    <div>
+      <pre>
+        <code>{JSON.stringify(state.filters, null, 2)}</code>
+      </pre>
+    </div>
+  </>
   )
 }
 

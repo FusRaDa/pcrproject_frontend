@@ -44,7 +44,7 @@ const ListAssay = () => {
           <Container>
       
             <Button onClick={() => setGroupAssays(!groupAssays)}>{!groupAssays ? "View Group Assays" : "View Individual Assays"}</Button>
-            <Button onClick={() => navigate('/assay/create')}>Create Assay</Button>
+            <Button onClick={() => navigate('/assay/create')}>Create Individual Assay</Button>
 
             <Form className="d-flex" onChange={() => searchAssay()}>
               <Form.Control
@@ -61,7 +61,7 @@ const ListAssay = () => {
                 .filter(assay => assay.assays.length === 0)
                 .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
                 .map(assay => (
-                  <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => setAssay(assay)}>
+                  <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => {setAssay(assay); console.log(assay)}}>
                     {`${assay.code}-${assay.name}`}
                   </ListGroup.Item>
                 ))}

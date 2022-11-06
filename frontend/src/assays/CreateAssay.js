@@ -1,17 +1,20 @@
 import React, { useContext, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import Container from "react-bootstrap/esm/Container"
 import Row from "react-bootstrap/Row"
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
+import Button from "react-bootstrap/Button"
 import ListGroup from 'react-bootstrap/ListGroup'
 
 import AuthContext from "../context/AuthContext"
-import Button from "react-bootstrap/Button"
 import AssayContext from "../context/AssayContext"
 
 const CreateAssay = () => {
   let {authTokens} = useContext(AuthContext)
-  let {assays} = useContext(AssayContext)
+  let {assays, setUpdating} = useContext(AssayContext)
+
+  const navigate = useNavigate()
 
   let [individual, setIndividual] = useState(true)
   let [search, setSearch] = useState("")
@@ -45,6 +48,8 @@ const CreateAssay = () => {
     })
     if(response.status === 201) {
       console.log('assay created successfully')
+      setUpdating(true)
+      navigate('/assay')
     } else {
       alert('error')
     }
@@ -112,6 +117,10 @@ const CreateAssay = () => {
 
 
         <Col>
+
+          {individual && <Container>
+            List of Reagents and Supplies to add
+          </Container>}
 
           {!individual && <Container>
             <Form className="d-flex" onChange={() => searchAssay()}>

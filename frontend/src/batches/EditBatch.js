@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import Form from 'react-bootstrap/Form';
 import BatchContext from "../context/BatchContext";
@@ -25,14 +25,15 @@ const EditBatch = ({selectedBatch, setEditing}) => {
       body: JSON.stringify({
         'assay':selectedBatch.assay, 
         'numberOfSamples':e.target.samples.value,
-        'dna_extraction': e.target.dna.value,
-        'rna_extraction': e.target.rna.value,
+        'dna_extraction': selectedBatch.dna_extraction !== null ? e.target.dna.value : null,
+        'rna_extraction': selectedBatch.rna_extraction !== null ? e.target.rna.value : null,
         'fieldLabels': labelData
       })
     })
     if(response.status === 200) {
       console.log('batch updated')
       setUpdating(true) //update table
+      setEditing(false)
     } else {
       alert('error')
     }
@@ -70,7 +71,6 @@ const EditBatch = ({selectedBatch, setEditing}) => {
     }
   }
 
-  
   return (
     <Container fluid="md">
       <Row>

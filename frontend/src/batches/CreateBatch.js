@@ -11,7 +11,6 @@ import BatchContext from "../context/BatchContext"
 import Row from 'react-bootstrap/Row'
 import AssayContext from "../context/AssayContext"
 
-
 const CreateBatch = () => {
   let {authTokens} = useContext(AuthContext)
   let {labels, setUpdating} = useContext(BatchContext)
@@ -43,8 +42,8 @@ const CreateBatch = () => {
         'assay': selectedAssay, 
         'numberOfSamples': e.target.samples.value, 
         'batchDate': date, 
-        'dna_extraction': e.target.dna.value === "" ? null : e.target.dna.value,
-        'rna_extraction': e.target.rna.value === "" ? null : e.target.rna.value, 
+        'dna_extraction': dna === true ? null : e.target.dna.value,
+        'rna_extraction': rna === true ? null : e.target.rna.value, 
         'fieldLabels': labelData
       })
     })
