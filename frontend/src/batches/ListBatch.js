@@ -1,59 +1,44 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from "react-router-dom"
 import BatchTable from '../components/BatchTable'
-import styled from 'styled-components'
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import BatchContext from '../context/BatchContext';
 import EditBatch from './EditBatch';
-
-const Styles = styled.div`
-  padding: 1rem;
-
-  table {
-    border-spacing: 0;
-    border: 1px solid black;
-
-    tr {
-      :last-child {
-        td {
-          border-bottom: 0;
-        }
-      }
-    }
-
-    tbody tr:hover {
-      background-color: grey;
-      color: white;
-      cursor: pointer;
-    }
-
-    th,
-    td {
-      margin: 0;
-      padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
-
-      :last-child {
-        border-right: 0;
-      }
-    }
-  }
-`
+import NumberRangeColumnFilter from '../components/NumberRangeColumnFilter';
+import SelectColumnFilter from '../components/SelectColumnFilter';
 
 const ListBatch = () => {
   const navigate = useNavigate()
   let {batches, labels} = useContext(BatchContext)
 
   let [editing, setEditing] = useState(false)
-  let [fullSheet, setFullSheet] = useState(true)
   let [rowClicked, setRowClicked] = useState(null)
   let [selectedBatch, setSelectedBatch] = useState(null)
 
   let [labelData, setLabelData] = useState([])
 
+  let [data, setData] = useState([])
+  let [loading, setLoading] = useState(false)
+  let [pageCount, setPageCount] = useState(0)
+  let fetchIdRef = useRef(0)
+
+  let fetchData = useCallback(({ pageSize, pageIndex }) => {
+      const fetchId = ++fetchIdRef.current
+
+      setLoading(true)
+
+      if (Object.keys(batches).length !== 0 && fetchId === fetchIdRef.current) {
+        const startRow = pageSize * pageIndex
+        const endRow = startRow + pageSize
+        setData(batches.results.slice(startRow, endRow))
+        setPageCount(batches.total_pages)
+        setLoading(false)
+      }
+    }, [batches]
+  )
+  
   //replace underscore with spaces for header column
   let spaceLabels = (string) => {
     return string.replace(/_+/g, ' ').trim()
@@ -61,10 +46,10 @@ const ListBatch = () => {
 
   useEffect(() => {
     let data = labels.map(label => {
-      return {Header: `${spaceLabels(label.label)}`, accessor: `fieldLabels.${label.label}`}
+      return {Header: `${spaceLabels(label.label)}`, accessor: `results.fieldLabels.${label.label}`}
     })
     setLabelData(data)
-  }, [labels])
+  }, [labels, batches])
 
   let renderColumns = () => {
     let columns = [
@@ -73,27 +58,33 @@ const ListBatch = () => {
         columns: [
           {
             Header: 'pk',
-            accessor: 'pk'
+            accessor: 'pk',
           },
           {
             Header: 'Assay',
             accessor: 'assay.name',
+            Filter: SelectColumnFilter,
+            filter: 'includes',
           },
           {
             Header: 'Code',
-            accessor: 'assay.code'
+            accessor: 'assay.code',
+            Filter: SelectColumnFilter,
+            filter: 'includes',
           },
           {
             Header: '# of Samples',
-            accessor: 'numberOfSamples'
+            accessor: 'numberOfSamples',
+            Filter: NumberRangeColumnFilter,
+            filter: 'between',
           },
           {
             Header: 'DNA Extraction Group',
-            accessor: 'dna_extraction'
+            accessor: 'dna_extraction',
           },
           {
             Header: 'RNA/Total-Nucleic Extraction Group',
-            accessor: 'rna_extraction'
+            accessor: 'rna_extraction',
           }
         ],
       },
@@ -113,34 +104,40 @@ const ListBatch = () => {
 
   let resetSelections = () => {
     setRowClicked(null)
+    setEditing(false)
   }
 
   return (
-    <Container>
+    <Container fluid>
       <Row>
-        <Col onClick={() => {setFullSheet(!fullSheet); resetSelections()}}>Master Sheet</Col>
+        <Col onClick={() => resetSelections()}>Master Sheet</Col>
         <Col>Edit Labels</Col>
         <Col onClick={() => navigate('/create')}>Create Batch</Col>
       </Row>
+      
       <Row>
         <Col>
-          <Styles>
-            <BatchTable 
-              columns={renderColumns()} 
-              data={batches} 
-              selectedBatch={selectedBatch}
-              setSelectedBatch={setSelectedBatch}
-              setEditing={setEditing} 
-              setFullSheet={setFullSheet}
-              rowClicked={rowClicked}
-              setRowClicked={setRowClicked}/>
-          </Styles>
+          <BatchTable 
+            columns={renderColumns()} 
+            data={data} 
+            setSelectedBatch={setSelectedBatch}
+            setEditing={setEditing} 
+            rowClicked={rowClicked}
+            setRowClicked={setRowClicked}
+            fetchData={fetchData}
+            loading={loading}
+            pageCount={pageCount}
+          />
         </Col>
 
-        {!fullSheet && 
-        <Col id='batch_screen'>
-          {editing && <EditBatch selectedBatch={selectedBatch} setEditing={setEditing}/>}
+        {editing && 
+        <Col xs={3} id='batch_screen'>
+          <EditBatch 
+            selectedBatch={selectedBatch} 
+            setEditing={setEditing}
+          />
         </Col>}
+
       </Row>
     </Container>
   )

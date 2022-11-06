@@ -1,7 +1,7 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
-
-const NumberRangeColumnFilter = ({column: { filterValue = [], preFilteredRows, setFilter, id }}) => {
+const NumberRangeColumnFilter = ({column: {filterValue = [], preFilteredRows, setFilter, id }}) => {
+  let [isSearch, setIsSearch] = useState(false)
 
   const [min, max] = useMemo(() => {
     let min = preFilteredRows.length ? preFilteredRows[0].values[id] : 0
@@ -14,38 +14,41 @@ const NumberRangeColumnFilter = ({column: { filterValue = [], preFilteredRows, s
   }, [id, preFilteredRows])
 
   return (
-    <div
-      style={{
-        display: 'flex',
-      }}
-    >
-      <input
-        value={filterValue[0] || ''}
-        type="number"
-        onChange={e => {
-          const val = e.target.value
-          setFilter((old = []) => [val ? parseInt(val, 10) : undefined, old[1]])
-        }}
-        placeholder={`Min (${min})`}
+    <div>
+      <button onClick={() => setIsSearch(!isSearch)}>{!isSearch ? 'S' : 'Collapse'}</button>
+      {isSearch && <div
         style={{
-          width: '70px',
-          marginRight: '0.5rem',
+          display: 'flex',
         }}
-      />
-      to
-      <input
-        value={filterValue[1] || ''}
-        type="number"
-        onChange={e => {
-          const val = e.target.value
-          setFilter((old = []) => [old[0], val ? parseInt(val, 10) : undefined])
-        }}
-        placeholder={`Max (${max})`}
-        style={{
-          width: '70px',
-          marginLeft: '0.5rem',
-        }}
-      />
+      >
+        <input
+          value={filterValue[0] || ''}
+          type="number"
+          onChange={e => {
+            const val = e.target.value
+            setFilter((old = []) => [val ? parseInt(val, 10) : undefined, old[1]])
+          }}
+          placeholder={`Min (${min})`}
+          style={{
+            width: '70px',
+            marginRight: '0.5rem',
+          }}
+        />
+        to
+        <input
+          value={filterValue[1] || ''}
+          type="number"
+          onChange={e => {
+            const val = e.target.value
+            setFilter((old = []) => [old[0], val ? parseInt(val, 10) : undefined])
+          }}
+          placeholder={`Max (${max})`}
+          style={{
+            width: '70px',
+            marginLeft: '0.5rem',
+          }}
+        />
+      </div>}
     </div>
   )
 }

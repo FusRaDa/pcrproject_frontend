@@ -3,8 +3,6 @@ import AuthContext from "../context/AuthContext";
 import Form from 'react-bootstrap/Form';
 import BatchContext from "../context/BatchContext";
 import Container from "react-bootstrap/Container";
-import Col from 'react-bootstrap/Col'
-import Row from 'react-bootstrap/Row'
 import Button from 'react-bootstrap/Button'
 
 const EditBatch = ({selectedBatch, setEditing}) => {
@@ -64,8 +62,8 @@ const EditBatch = ({selectedBatch, setEditing}) => {
     })
     if(response.status === 204) {
       console.log('batch deleted')
-      setEditing(false)
       setUpdating(true)
+      setEditing(false)
     } else {
       alert('error')
     }
@@ -73,56 +71,52 @@ const EditBatch = ({selectedBatch, setEditing}) => {
 
   return (
     <Container fluid="md">
-      <Row>
-        <Col>
-          <Form onSubmit={updateBatch}>
-            <Form.Group>
-              <Form.Label>Assay Selected</Form.Label>
-                <Form.Control value={`${selectedBatch.assay.code}-${selectedBatch.assay.name}`} disabled/>
-            </Form.Group>
-  
-            <Form.Group>
-              <Form.Label>Number Of Samples</Form.Label>
-              <Form.Control name="samples" type="text" placeholder="Enter Number of Samples" key={selectedBatch.numberOfSamples} defaultValue={selectedBatch.numberOfSamples}/>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>DNA Extraction Group</Form.Label>
+      <Form onSubmit={updateBatch}>
+        <Form.Group>
+          <Form.Label>Assay Selected</Form.Label>
+            <Form.Control value={`${selectedBatch.assay.code}-${selectedBatch.assay.name}`} disabled/>
+        </Form.Group>
+
+        <Form.Group>
+          <Form.Label>Number Of Samples</Form.Label>
+          <Form.Control name="samples" type="text" placeholder="Enter Number of Samples" key={selectedBatch.numberOfSamples} defaultValue={selectedBatch.numberOfSamples}/>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>DNA Extraction Group</Form.Label>
+          <Form.Control
+            id="dna_input" name="dna" type="text" 
+            required={selectedBatch.dna_extraction !== null ? true : false} 
+            disabled={selectedBatch.dna_extraction !== null ? false : true}
+            placeholder="Not Required"
+            key={selectedBatch.dna_extraction !== null ? selectedBatch.dna_extraction : null}
+            defaultValue={selectedBatch.dna_extraction !== null ? selectedBatch.dna_extraction : null}/>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>RNA/Total-Nucleic Group</Form.Label>
+          <Form.Control
+            id="rna_input" name="rna" type="text" 
+            required={selectedBatch.rna_extraction !== null ? true : false} 
+            disabled={selectedBatch.rna_extraction !== null ? false : true}
+            placeholder="Not Required"
+            key={selectedBatch.rna_extraction !== null ? selectedBatch.rna_extraction : null}
+            defaultValue={selectedBatch.rna_extraction !== null ? selectedBatch.rna_extraction : null}/>
+        </Form.Group>
+
+        <Form.Label>Additional Information</Form.Label>
+          {labels.map(label => (
+            <Form.Group key={`info_${label.pk}`}>
               <Form.Control
-                id="dna_input" name="dna" type="text" 
-                required={selectedBatch.dna_extraction !== null ? true : false} 
-                disabled={selectedBatch.dna_extraction !== null ? false : true}
-                placeholder="Not Required"
-                key={selectedBatch.dna_extraction !== null ? selectedBatch.dna_extraction : null}
-                defaultValue={selectedBatch.dna_extraction !== null ? selectedBatch.dna_extraction : null}/>
+                type="text"
+                name="info"
+                placeholder={`Enter ${label.label} Information`}
+                key={selectedBatch.fieldLabels[label.label]}
+                defaultValue={selectedBatch.fieldLabels[label.label]}
+              />
             </Form.Group>
-            <Form.Group>
-              <Form.Label>RNA/Total-Nucleic Group</Form.Label>
-              <Form.Control
-                id="rna_input" name="rna" type="text" 
-                required={selectedBatch.rna_extraction !== null ? true : false} 
-                disabled={selectedBatch.rna_extraction !== null ? false : true}
-                placeholder="Not Required"
-                key={selectedBatch.rna_extraction !== null ? selectedBatch.rna_extraction : null}
-                defaultValue={selectedBatch.rna_extraction !== null ? selectedBatch.rna_extraction : null}/>
-            </Form.Group>
-  
-            <Form.Label>Additional Information</Form.Label>
-              {labels.map(label => (
-                <Form.Group key={`info_${label.pk}`}>
-                  <Form.Control
-                    type="text"
-                    name="info"
-                    placeholder={`Enter ${label.label} Information`}
-                    key={selectedBatch.fieldLabels[label.label]}
-                    defaultValue={selectedBatch.fieldLabels[label.label]}
-                  />
-                </Form.Group>
-              ))}
-            <Button type="submit" variant="primary">Update Batch</Button>
-          </Form>
-          <Button type="submit" variant="primary" onClick={deleteBatch}>Delete Batch</Button>
-        </Col>
-      </Row>
+          ))}
+        <Button type="submit" variant="primary">Update Batch</Button>
+      </Form>
+      <Button type="submit" variant="primary" onClick={deleteBatch}>Delete Batch</Button>
     </Container>
   )
 }
