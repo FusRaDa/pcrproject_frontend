@@ -16,8 +16,7 @@ const ListBatch = () => {
   let [editing, setEditing] = useState(false)
   let [rowClicked, setRowClicked] = useState(null)
   let [selectedBatch, setSelectedBatch] = useState(null)
-
-  let [labelData, setLabelData] = useState([])
+  let [columns, setColumns] = useState([])
 
   let [data, setData] = useState([])
   let [loading, setLoading] = useState(false)
@@ -38,62 +37,54 @@ const ListBatch = () => {
       }
     }, [batches]
   )
+
+  useEffect(() => {
+    let data = labels.map(label => {
+      return {Header: `${spaceLabels(label.label)}`, accessor: `fieldLabels.${label.label}`}
+    })
+    setColumns(renderColumns(data))
+  }, [labels])
   
   //replace underscore with spaces for header column
   let spaceLabels = (string) => {
     return string.replace(/_+/g, ' ').trim()
   }
 
-  useEffect(() => {
-    let data = labels.map(label => {
-      return {Header: `${spaceLabels(label.label)}`, accessor: `results.fieldLabels.${label.label}`}
-    })
-    setLabelData(data)
-  }, [labels, batches])
-
-  let renderColumns = () => {
+  let renderColumns = (data) => {
     let columns = [
       {
-        Header: 'Batch Info',
-        columns: [
-          {
-            Header: 'pk',
-            accessor: 'pk',
-          },
-          {
-            Header: 'Assay',
-            accessor: 'assay.name',
-            Filter: SelectColumnFilter,
-            filter: 'includes',
-          },
-          {
-            Header: 'Code',
-            accessor: 'assay.code',
-            Filter: SelectColumnFilter,
-            filter: 'includes',
-          },
-          {
-            Header: '# of Samples',
-            accessor: 'numberOfSamples',
-            Filter: NumberRangeColumnFilter,
-            filter: 'between',
-          },
-          {
-            Header: 'DNA Extraction Group',
-            accessor: 'dna_extraction',
-          },
-          {
-            Header: 'RNA/Total-Nucleic Extraction Group',
-            accessor: 'rna_extraction',
-          }
-        ],
+        Header: 'pk',
+        accessor: 'pk',
       },
       {
-        Header: 'Additional Info',
-        columns: labelData
+        Header: 'Assay',
+        accessor: 'assay.name',
+        Filter: SelectColumnFilter,
+        filter: 'includes',
+      },
+      {
+        Header: 'Code',
+        accessor: 'assay.code',
+        Filter: SelectColumnFilter,
+        filter: 'includes',
+      },
+      {
+        Header: '# of Samples',
+        accessor: 'numberOfSamples',
+        Filter: NumberRangeColumnFilter,
+        filter: 'between',
+      },
+      {
+        Header: 'DNA Extraction Group',
+        accessor: 'dna_extraction',
+      },
+      {
+        Header: 'RNA/Total-Nucleic Extraction Group',
+        accessor: 'rna_extraction',
       },
     ]
-    return columns
+    let newColumn = columns.concat(data)
+    return newColumn
   }
  
   useEffect(() => {
@@ -118,7 +109,7 @@ const ListBatch = () => {
       <Row>
         <Col>
           <BatchTable 
-            columns={renderColumns()} 
+            columns={columns} 
             data={data} 
             setSelectedBatch={setSelectedBatch}
             setEditing={setEditing} 

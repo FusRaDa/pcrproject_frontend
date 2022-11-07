@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useTable, useFilters, usePagination } from 'react-table'
+import { useTable, useFilters, usePagination, useColumnOrder } from 'react-table'
 import DefaultColumnFilter from './DefaultColumnFilter'
 import FuzzyTextFilterFn from './FuzzyTextFilterFn'
 import styled from 'styled-components'
@@ -90,6 +90,10 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    //column order
+    visibleColumns,
+    setColumnOrder,
+    //pagination
     page,
     canPreviousPage, 
     canNextPage, 
@@ -104,7 +108,8 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
     {
       initialState: {
         hiddenColumns: ['pk'],
-        pageIndex: 0
+        pageIndex: 0,
+        columnOrder: JSON.parse(localStorage.getItem('columnOrder'))
         },  
       columns,
       data,
@@ -114,12 +119,28 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
       pageCount: controlledPageCount,
     },
     useFilters,
-    usePagination
+    usePagination,
+    useColumnOrder,
   )
+
+  let moveColumnRight = (column) => {
+    let currentIndex = visibleColumns.indexOf(column, 0)
+    visibleColumns[currentIndex] = visibleColumns.splice(currentIndex + 1, 1, visibleColumns[currentIndex])[0]
+    localStorage.setItem('columnOrder', JSON.stringify(visibleColumns.map(d => d.id)))
+    setColumnOrder(visibleColumns.map(d => d.id))
+  }
+
+  let moveColumnLeft = (column) => {
+    let currentIndex = visibleColumns.indexOf(column, 0)
+    visibleColumns[currentIndex] = visibleColumns.splice(currentIndex - 1, 1, visibleColumns[currentIndex])[0]
+    localStorage.setItem('columnOrder', JSON.stringify(visibleColumns.map(d => d.id)))
+    setColumnOrder(visibleColumns.map(d => d.id))
+  }
 
   useEffect(() => {
     fetchData({ pageIndex, pageSize })
   }, [fetchData, pageIndex, pageSize])
+
 
   return (
     <Styles>
@@ -130,6 +151,10 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps()}>
+                    <div>
+                      {visibleColumns.indexOf(column) !== 0 && <button onClick={() => moveColumnLeft(column)}>left</button> }
+                      {visibleColumns.indexOf(column) !== visibleColumns.length - 1 && <button onClick={() => moveColumnRight(column)}>right</button>}
+                    </div>
                     {column.render('Header')}
                     {/* column filter */}
                     <div>{column.canFilter ? column.render('Filter') : null}</div>
