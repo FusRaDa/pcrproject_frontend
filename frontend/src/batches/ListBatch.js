@@ -5,7 +5,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import BatchContext from '../context/BatchContext';
-import EditBatch from './EditBatch';
 import NumberRangeColumnFilter from '../components/NumberRangeColumnFilter';
 import SelectColumnFilter from '../components/SelectColumnFilter';
 
@@ -13,15 +12,15 @@ const ListBatch = () => {
   const navigate = useNavigate()
   let {batches, labels} = useContext(BatchContext)
 
-  let [editing, setEditing] = useState(false)
   let [rowClicked, setRowClicked] = useState(null)
-  let [selectedBatch, setSelectedBatch] = useState(null)
   let [columns, setColumns] = useState([])
 
   let [data, setData] = useState([])
   let [loading, setLoading] = useState(false)
   let [pageCount, setPageCount] = useState(0)
   let fetchIdRef = useRef(0)
+
+  let [isEdit, setIsEdit] = useState(false)
 
   let fetchData = useCallback(({ pageSize, pageIndex }) => {
       const fetchId = ++fetchIdRef.current
@@ -86,16 +85,9 @@ const ListBatch = () => {
     let newColumn = columns.concat(data)
     return newColumn
   }
- 
-  useEffect(() => {
-    if (selectedBatch !== null) {
-      setEditing(true)
-    } 
-  },[selectedBatch])
 
   let resetSelections = () => {
     setRowClicked(null)
-    setEditing(false)
   }
 
   return (
@@ -111,23 +103,15 @@ const ListBatch = () => {
           <BatchTable 
             columns={columns} 
             data={data} 
-            setSelectedBatch={setSelectedBatch}
-            setEditing={setEditing} 
             rowClicked={rowClicked}
             setRowClicked={setRowClicked}
             fetchData={fetchData}
             loading={loading}
             pageCount={pageCount}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
           />
         </Col>
-
-        {editing && 
-        <Col xs={3} id='batch_screen'>
-          <EditBatch 
-            selectedBatch={selectedBatch} 
-            setEditing={setEditing}
-          />
-        </Col>}
 
       </Row>
     </Container>

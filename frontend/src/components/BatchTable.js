@@ -1,8 +1,10 @@
-import { useEffect, useMemo } from 'react'
-import { useTable, useFilters, usePagination, useColumnOrder } from 'react-table'
+import React, { useEffect, useMemo } from 'react'
+import { useTable, useFilters, usePagination, useColumnOrder, useExpanded } from 'react-table'
 import DefaultColumnFilter from './DefaultColumnFilter'
 import FuzzyTextFilterFn from './FuzzyTextFilterFn'
 import styled from 'styled-components'
+import EditableCell from '../components/EditableCell'
+import DynamicCell from './DynamicCell'
 
 const Styles = styled.div`
   display: block;
@@ -63,7 +65,7 @@ const Styles = styled.div`
 //remove filter if search is empty
 FuzzyTextFilterFn.autoRemove = val => !val
 
-const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked, setEditing, fetchData, loading, pageCount: controlledPageCount}) => {
+const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loading, pageCount: controlledPageCount }) => {
 
   const filterTypes = useMemo(() => ({
       // Add a new fuzzyTextFilterFn filter type.
@@ -82,7 +84,8 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
       }), [])
 
   const defaultColumn = useMemo(() => ({
-    Filter: DefaultColumnFilter
+    Filter: DefaultColumnFilter,
+    EditCell : EditableCell,
   }), [])
 
   const {
@@ -90,6 +93,7 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    toggleAllRowsExpanded,
     //column order
     visibleColumns,
     setColumnOrder,
@@ -118,6 +122,7 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
       manualPagination: true,
       pageCount: controlledPageCount,
     },
+    useExpanded,
     useFilters,
     usePagination,
     useColumnOrder,
@@ -135,6 +140,11 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
     visibleColumns[currentIndex] = visibleColumns.splice(currentIndex - 1, 1, visibleColumns[currentIndex])[0]
     localStorage.setItem('columnOrder', JSON.stringify(visibleColumns.map(d => d.id)))
     setColumnOrder(visibleColumns.map(d => d.id))
+  }
+
+  let expandRow = (row) => {
+    toggleAllRowsExpanded(false)
+    row.toggleRowExpanded()
   }
 
   useEffect(() => {
@@ -168,16 +178,27 @@ const BatchTable = ({columns, data, setSelectedBatch, rowClicked, setRowClicked,
             {page.map((row, i) => {
               prepareRow(row)
               return (
-                <tr {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}} onClick={() => {
-                  setRowClicked(i);
-                  setSelectedBatch(row.original);
-                  setEditing(true)
-                }}>
-                  {row.cells.map(cell => {
-                    return <td {...cell.getCellProps()}>
-                    {cell.render('Cell')}</td>
-                  })}
-                </tr>
+                <React.Fragment key={row.id}>
+                  <tr {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}}
+                    onClick={() => { setRowClicked(i); expandRow(row) }}>
+                    {row.cells.map(cell => {
+                      return (
+                        <DynamicCell 
+                          key={cell.column.Header} 
+                          cell={cell}
+                        />
+                      )
+                    })}
+                  </tr>
+
+                {row.isExpanded ? (
+                  <tr>
+                    <td colSpan={visibleColumns.length}>
+                      edit
+                    </td>
+                  </tr>
+                ) : null}
+                </React.Fragment>
               )
             })}
 
