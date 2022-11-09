@@ -31,20 +31,36 @@ const CreateAssay = () => {
 
   let addAssay = async (e) => {
     e.preventDefault()
+    let data = {}
+
+    if (e.target.type !== undefined) {
+      //individual assay
+      data = {
+        'name': e.target.name.value, 
+        'code': e.target.code.value,
+        'type': e.target.type.value !== undefined ? e.target.type.value : null,
+        'reagent': null,
+        'supply': null,
+        'assays' : null
+      }
+    } else {
+      //group assay
+      data = {
+        'name': e.target.name.value, 
+        'code': e.target.code.value,
+        'reagent': null,
+        'supply': null, 
+        'assays' : addedAssays
+      }
+    }
+    
     let response = await fetch('http://127.0.0.1:8000/api/assays/create/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       },
-      body: JSON.stringify({
-        'name': e.target.name.value, 
-        'code': e.target.code.value, 
-        'type': e.target.type.value !== undefined ? e.target.type.value : null,
-        'reagent': null,
-        'supply': null, 
-        'assays' : addedAssays
-      })
+      body: JSON.stringify(data)
     })
     if(response.status === 201) {
       console.log('assay created successfully')

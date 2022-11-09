@@ -5,6 +5,8 @@ import FuzzyTextFilterFn from './FuzzyTextFilterFn'
 import styled from 'styled-components'
 import EditableCell from '../components/EditableCell'
 import DynamicCell from './DynamicCell'
+import Button from 'react-bootstrap/Button'
+import Row from 'react-bootstrap/Row'
 
 const Styles = styled.div`
   display: block;
@@ -21,6 +23,12 @@ const Styles = styled.div`
     border-right: 1px solid black;
   }
 
+  .batch_row: hover {
+    background-color: grey;
+    color: white;
+    cursor: pointer;
+  }
+
   table {
     width: 100%;
     border-spacing: 0;
@@ -31,12 +39,6 @@ const Styles = styled.div`
           border-bottom: 0;
         }
       }
-    }
-
-    tbody tr:hover {
-      background-color: grey;
-      color: white;
-      cursor: pointer;
     }
 
     th,
@@ -143,8 +145,20 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
   }
 
   let expandRow = (row) => {
-    toggleAllRowsExpanded(false)
-    row.toggleRowExpanded()
+    if (row.isExpanded) {
+      row.toggleRowExpanded()
+    } else {
+      toggleAllRowsExpanded(false)
+      row.toggleRowExpanded()
+    }
+  }
+
+  let handleRowClicked = (i) => {
+    if (i !== rowClicked) {
+      setRowClicked(i)
+    } else {
+      setRowClicked(null)
+    }
   }
 
   useEffect(() => {
@@ -179,8 +193,8 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
               prepareRow(row)
               return (
                 <React.Fragment key={row.id}>
-                  <tr {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}}
-                    onClick={() => { setRowClicked(i); expandRow(row) }}>
+                  <tr className='batch_row' {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}}
+                    onClick={() => { handleRowClicked(i); expandRow(row); }}>
                     {row.cells.map(cell => {
                       return (
                         <DynamicCell 
@@ -194,7 +208,11 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
                 {row.isExpanded ? (
                   <tr>
                     <td colSpan={visibleColumns.length}>
-                      edit
+                      <Row>
+                      <Button>Delete</Button>
+                      <Button>View Details</Button>
+               
+                      </Row>
                     </td>
                   </tr>
                 ) : null}

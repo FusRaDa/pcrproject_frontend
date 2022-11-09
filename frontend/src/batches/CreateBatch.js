@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react"
-import { useNavigate } from "react-router-dom"
 
 import AuthContext from "../context/AuthContext"
 import Col from 'react-bootstrap/Col'
@@ -24,7 +23,6 @@ const CreateBatch = () => {
 
   let [search, setSearch] = useState("")
 
-  const navigate = useNavigate()
 
   let addBatch = async (e) => {
     e.preventDefault()
@@ -50,11 +48,20 @@ const CreateBatch = () => {
     if(response.status === 201) {
       console.log('batch created successfully')
       setUpdating(true)
-      navigate('/')
-      
+      clearFields()
     } else {
       alert('error')
     }
+  }
+
+  let clearFields = () => {
+    setSelectedAssay(null)
+    document.getElementById('samples').value = ""
+    document.getElementById('dna_value').value = ""
+    document.getElementById('rna_value').value = ""
+    labels.forEach(label => {
+      document.getElementById(`label_${label.pk}`).value= ""
+    })
   }
 
   let batchData = (e) => {
@@ -137,7 +144,7 @@ const CreateBatch = () => {
             <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
               <Form.Group>
                 <Form.Label>Assay</Form.Label>
-                <Form.Control disabled value={selectedAssay === null ? "Select Assay" : `${selectedAssay.code}-${selectedAssay.name}`}/>
+                <Form.Control id="assay" disabled value={selectedAssay === null ? "Select Assay" : `${selectedAssay.code}-${selectedAssay.name}`}/>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Number Of Samples</Form.Label>

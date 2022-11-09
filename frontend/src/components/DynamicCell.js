@@ -19,7 +19,7 @@ const DynamicCell = ({ cell }) => {
   }
 
   return (
-    <td {...cell.getCellProps()} onDoubleClick={() => notEditable()} onKeyDown={handleKeyDown}>
+    <td {...cell.getCellProps()} onDoubleClick={() => notEditable()} onKeyDown={handleKeyDown} onMouseLeave={() => setIsEdit(false)}>
       {isEdit ? cell.render('EditCell', {setIsEdit}) : cell.render('Cell')}
     </td>
   )
