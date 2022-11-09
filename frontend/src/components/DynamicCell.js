@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 
 const DynamicCell = ({ cell }) => {
   let [isEdit, setIsEdit] = useState(false)
@@ -20,7 +20,7 @@ const DynamicCell = ({ cell }) => {
 
   return (
     <td {...cell.getCellProps()} onDoubleClick={() => notEditable()} onKeyDown={handleKeyDown}>
-      {isEdit ? cell.render('EditCell') : cell.render('Cell')}
+      {isEdit ? cell.render('EditCell', {setIsEdit}) : cell.render('Cell')}
     </td>
   )
 }

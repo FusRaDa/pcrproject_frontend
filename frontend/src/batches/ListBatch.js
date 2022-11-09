@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import BatchContext from '../context/BatchContext';
 import NumberRangeColumnFilter from '../components/NumberRangeColumnFilter';
 import SelectColumnFilter from '../components/SelectColumnFilter';
+import CreateBatch from './CreateBatch';
 
 const ListBatch = () => {
   const navigate = useNavigate()
@@ -112,7 +113,9 @@ const ListBatch = () => {
             setIsEdit={setIsEdit}
           />
         </Col>
-
+      </Row>
+      <Row>
+        <CreateBatch/>
       </Row>
     </Container>
   )

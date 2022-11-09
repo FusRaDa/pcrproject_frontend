@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import AuthContext from '../context/AuthContext'
 import BatchContext from '../context/BatchContext'
 
-const EditableCell = ({ cell, value: initialValue }) => {
+const EditableCell = ({ cell, value: initialValue, setIsEdit}) => {
   let {authTokens} = useContext(AuthContext)
   let {setUpdating} = useContext(BatchContext)
 
@@ -59,7 +59,7 @@ const EditableCell = ({ cell, value: initialValue }) => {
     setBatch(cell.row.original)
   }, [initialValue, cell])
 
-  return <input defaultValue={value} onChange={onChange} onKeyDown={handleKeyDown}/>
+  return <input defaultValue={value} onChange={onChange} onKeyDown={handleKeyDown} onBlur={() => setIsEdit(false)}/>
 }
 
 export default EditableCell
