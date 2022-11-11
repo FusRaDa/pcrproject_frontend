@@ -95,7 +95,7 @@ const CreateBatch = () => {
     setRNA(true)
 
     //for single assay
-    if (chosenAssay.assays.length === 0) {
+    if (chosenAssay.assay.length === 0) {
       if (chosenAssay.type === 'DNA') {
         setDNA(false)
         document.getElementById('rna_value').value=""
@@ -105,14 +105,14 @@ const CreateBatch = () => {
         document.getElementById('dna_value').value=""
       }
     //for assays in a group (assays)
-    } else if (chosenAssay.assays.length >= 0) {
+    } else if (chosenAssay.assay.length >= 0) {
       let dna = false
       let rna = false
-      for (let i=0; i<chosenAssay.assays.length; i++) {
-        if (chosenAssay.assays[i].type === 'DNA') {
+      for (let i=0; i<chosenAssay.assay.length; i++) {
+        if (chosenAssay.assay[i].type === 'DNA') {
           dna = true
         }
-        if (chosenAssay.assays[i].type === 'RNA' || chosenAssay.assays[i].type === 'Total nucleic') {
+        if (chosenAssay.assay[i].type === 'RNA' || chosenAssay.assay[i].type === 'Total nucleic') {
           rna = true
         }
       }
@@ -196,7 +196,7 @@ const CreateBatch = () => {
 
             {!groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
             {assays
-              .filter(assay => assay.assays.length === 0)
+              .filter(assay => assay.assay.length === 0)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
                 <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
@@ -207,7 +207,7 @@ const CreateBatch = () => {
 
             {groupList && <ListGroup style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
             {assays
-              .filter(assay => assay.assays.length > 1)
+              .filter(assay => assay.assay.length > 1)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
                 <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>

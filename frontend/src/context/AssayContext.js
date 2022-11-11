@@ -22,6 +22,7 @@ export const AssayProvider = ({children}) => {
     let data = await response.json()
     if (response.status === 200) {
       setAssays(data)
+      console.log(data)
     } else {
       alert('error')
     }

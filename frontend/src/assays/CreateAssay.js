@@ -39,18 +39,16 @@ const CreateAssay = () => {
         'name': e.target.name.value, 
         'code': e.target.code.value,
         'type': e.target.type.value !== undefined ? e.target.type.value : null,
-        'reagent': null,
-        'supply': null,
-        'assays' : null
+        //TODO
+        // 'reagent_ids': required,
+        // 'supply_ids': required,
       }
     } else {
       //group assay
       data = {
         'name': e.target.name.value, 
         'code': e.target.code.value,
-        'reagent': null,
-        'supply': null, 
-        'assays' : addedAssays
+        'assay_ids' : addedAssays.map(a => a.pk)
       }
     }
     
@@ -150,7 +148,7 @@ const CreateAssay = () => {
             <ListGroup>
               {assays
                 //allow assays clicked to be edited/details and added to group assay
-                .filter(assay => assay.assays.length === 0)
+                .filter(assay => assay.assay.length === 0)
                 .filter(assay => !addedAssays.includes(assay))
                 .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
                 .map(assay => (

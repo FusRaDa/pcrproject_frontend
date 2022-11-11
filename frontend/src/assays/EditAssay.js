@@ -33,7 +33,7 @@ const EditAssay = () => {
         'type': e.target.type.value,
         // 'reagent':
         // 'supply':
-        // 'assays':
+        // 'assay':
       })
     })
     if(response.status === 200) {
@@ -67,7 +67,7 @@ const EditAssay = () => {
       <Row>
         <Col>
 
-          {location.state.assay.assays.length === 0 && 
+          {location.state.assay.assay.length === 0 && 
           <Form onSubmit={updateAssay}>
             <Form.Group>
               <Form.Label>Assay Name</Form.Label>
@@ -96,7 +96,7 @@ const EditAssay = () => {
           </Form>}
 
 
-          {location.state.assay.assays.length > 1 && 
+          {location.state.assay.assay.length > 1 && 
           <Form>
             Group assay
           </Form>}

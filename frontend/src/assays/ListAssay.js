@@ -58,7 +58,7 @@ const ListAssay = () => {
             <ListGroup>
               {assays
                 //allow assays clicked to be edited/details and added to group assay
-                .filter(assay => assay.assays.length === 0)
+                .filter(assay => assay.assay.length === 0)
                 .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
                 .map(assay => (
                   <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => {setAssay(assay); console.log(assay)}}>
@@ -69,7 +69,7 @@ const ListAssay = () => {
 
             {groupAssays && <ListGroup>
             {assays
-              .filter(assay => assay.assays.length > 1)
+              .filter(assay => assay.assay.length > 1)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
                 <ListGroup.Item key={assay.pk} action variant="secondary" onClick={() => setAssay(assay)}>
@@ -90,20 +90,20 @@ const ListAssay = () => {
                 <ListGroup.Item>Name: {assay.name}</ListGroup.Item>
                 <ListGroup.Item>Code: {assay.code}</ListGroup.Item>
                 <ListGroup.Item>Type: {assay.type}</ListGroup.Item>
-                  {assay.assays.length > 1 && 
+                  {assay.assay.length > 1 && 
                   <ListGroup>
                     Grouped Assays
-                    {assay.assays.map(a => (
-                      <ListGroup.Item key={a.pk}>
+                    {assay.assay.map(a => (
+                      <ListGroup.Item key={`assay_${a.pk}`}>
                         {a.name}
                       </ListGroup.Item>))}
                   </ListGroup>}
-
+{/* 
                   {!groupAssays && 
                   <ListGroup>
                     Reagents
                     {assay.reagent.map(r => (
-                      <ListGroup.Item key={r.pk}>
+                      <ListGroup.Item key={`reagent_${r.pk}`}>
                         {r.name}
                       </ListGroup.Item>
                     ))}
@@ -113,11 +113,12 @@ const ListAssay = () => {
                   <ListGroup>
                     Supplies
                     {assay.supply.map(s => (
-                      <ListGroup.Item key={s.pk}>
+                      <ListGroup.Item key={`supply_${s.pk}`}>
                         {s.name}
                       </ListGroup.Item>
                     ))}
-                  </ListGroup>}
+                  </ListGroup>} */}
+                  
               </ListGroup>
               <Button onClick={() => navigate(`/assay/edit/${assay.pk}`, {state: {assay:assay}})}>Edit this Assay</Button>
             </Card>}
