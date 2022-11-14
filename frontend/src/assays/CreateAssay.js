@@ -31,14 +31,21 @@ const CreateAssay = () => {
 
   let addAssay = async (e) => {
     e.preventDefault()
+    
+    if (addedAssays.length === 0 && !individual) {
+      alert('grouped assays cannot contain only one assay')
+      return
+    }
+
     let data = {}
 
+    //if form is for individual assay use this data, else use the latter data for group assays
     if (e.target.type !== undefined) {
       //individual assay
       data = {
         'name': e.target.name.value, 
         'code': e.target.code.value,
-        'type': e.target.type.value !== undefined ? e.target.type.value : null,
+        'type': e.target.type.value,
         //TODO
         // 'reagent_ids': required,
         // 'supply_ids': required,
@@ -129,14 +136,13 @@ const CreateAssay = () => {
         </Col>
 
 
-
         <Col>
-
           {individual && <Container>
             List of Reagents and Supplies to add
           </Container>}
 
-          {!individual && <Container>
+          {!individual && 
+          <Container>
             <Form className="d-flex" onChange={() => searchAssay()}>
               <Form.Control
                 type="search"

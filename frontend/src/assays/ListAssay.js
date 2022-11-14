@@ -98,7 +98,8 @@ const ListAssay = () => {
                         {a.name}
                       </ListGroup.Item>))}
                   </ListGroup>}
-{/* 
+                
+                {/* 
                   {!groupAssays && 
                   <ListGroup>
                     Reagents
