@@ -1,16 +1,21 @@
-import React, { useContext, useEffect, useRef, useState, useCallback } from 'react'
-import { useNavigate } from "react-router-dom"
-import BatchTable from '../components/BatchTable'
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
+import BatchTable from '../components/BatchTable';
 import BatchContext from '../context/BatchContext';
 import NumberRangeColumnFilter from '../components/NumberRangeColumnFilter';
 import SelectColumnFilter from '../components/SelectColumnFilter';
 import CreateBatch from './CreateBatch';
+import BatchLabels from './BatchLabels';
+
+//react-bootstrap
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/esm/Button';
+import Modal from 'react-bootstrap/Modal';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
 
 const ListBatch = () => {
-  const navigate = useNavigate()
   let {batches, labels} = useContext(BatchContext)
 
   let [rowClicked, setRowClicked] = useState(null)
@@ -23,17 +28,19 @@ const ListBatch = () => {
 
   let [isEdit, setIsEdit] = useState(false)
 
+  let [show, setShow] = useState(false)
+
   let fetchData = useCallback(({ pageSize, pageIndex }) => {
-      const fetchId = ++fetchIdRef.current
+    const fetchId = ++fetchIdRef.current
 
-      setLoading(true)
+    setLoading(true)
 
-      if (Object.keys(batches).length !== 0 && fetchId === fetchIdRef.current) {
-        const startRow = pageSize * pageIndex
-        const endRow = startRow + pageSize
-        setData(batches.results.slice(startRow, endRow))
-        setPageCount(batches.total_pages)
-        setLoading(false)
+    if (Object.keys(batches).length !== 0 && fetchId === fetchIdRef.current) {
+      const startRow = pageSize * pageIndex
+      const endRow = startRow + pageSize
+      setData(batches.results.slice(startRow, endRow))
+      setPageCount(batches.total_pages)
+      setLoading(false)
       }
     }, [batches]
   )
@@ -44,7 +51,7 @@ const ListBatch = () => {
     })
     setColumns(renderColumns(data))
   }, [labels])
-  
+
   //replace underscore with spaces for header column
   let spaceLabels = (string) => {
     return string.replace(/_+/g, ' ').trim()
@@ -55,6 +62,11 @@ const ListBatch = () => {
       {
         Header: 'pk',
         accessor: 'pk',
+      },
+      {
+        Header: 'Batch Date Created',
+        accessor: 'batchDate',
+        //TODO: add sort by date filter
       },
       {
         Header: 'Assay',
@@ -87,36 +99,70 @@ const ListBatch = () => {
     return newColumn
   }
 
-  let resetSelections = () => {
-    setRowClicked(null)
+  let popover = (title, info) => {
+    return (
+      <Popover>
+        <Popover.Header style={{backgroundColor: 'red'}}>
+          {title}
+        </Popover.Header>
+        <Popover.Body>
+          {info}
+        </Popover.Body>
+      </Popover>
+    )
   }
 
   return (
     <Container fluid>
       <Row>
-        <Col onClick={() => resetSelections()}>Master Sheet</Col>
-        <Col>Edit Labels</Col>
-        <Col onClick={() => navigate('/create')}>Create Batch</Col>
-      </Row>
-      
-      <Row>
         <Col>
-          <BatchTable 
-            columns={columns} 
-            data={data} 
-            rowClicked={rowClicked}
-            setRowClicked={setRowClicked}
-            fetchData={fetchData}
-            loading={loading}
-            pageCount={pageCount}
-            isEdit={isEdit}
-            setIsEdit={setIsEdit}
-          />
+          <OverlayTrigger placement='right'
+            overlay={popover("Dynamic Table", "Part of this table can be modified. Columns such as assay and # of samples are mandatory fields and therefore cannot be edited.")}>
+            <Button onClick={() => setShow(true)}>Add/Edit Label Columns</Button>
+          </OverlayTrigger>
         </Col>
       </Row>
+
       <Row>
-        <CreateBatch/>
+        <OverlayTrigger placement='bottom'
+          overlay={popover(
+            "React-Table Guide", 
+            "For existing rows, double click on a cell to edit information and press enter to update. " +  
+            "You may rearrange columns by pressing left/right. You can also use the search tool (S).")}>
+          <Col>
+            <BatchTable 
+              columns={columns} 
+              data={data} 
+              rowClicked={rowClicked}
+              setRowClicked={setRowClicked}
+              fetchData={fetchData}
+              loading={loading}
+              pageCount={pageCount}
+              isEdit={isEdit}
+              setIsEdit={setIsEdit}
+            />
+          </Col>
+        </OverlayTrigger>
       </Row>
+
+      <OverlayTrigger placement='top' overlay={popover("Create New Batch", "Select an assay from a list to include in the batch. To edit/add assays click on assays on top of page.")}>
+        <Row style={{marginTop: '50px'}}>
+          <CreateBatch/>
+        </Row>
+      </OverlayTrigger>
+
+      <Modal show={show} onHide={() => setShow(false)} dialogClassName="batch-modal" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Additional Label Columns
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <BatchLabels/>
+        </Modal.Body>
+      </Modal>
+
+   
     </Container>
   )
 }

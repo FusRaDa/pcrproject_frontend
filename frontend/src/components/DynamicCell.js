@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-const DynamicCell = ({ cell }) => {
+const DynamicCell = ({ cell, toggleAllRowsExpanded, setEditRow }) => {
   let [isEdit, setIsEdit] = useState(false)
 
   let notEditable = () => {
@@ -9,6 +9,8 @@ const DynamicCell = ({ cell }) => {
       alert('cannot change this cell')
     } else {
       setIsEdit(true)
+      toggleAllRowsExpanded(false)
+      setEditRow(true)
     }
   }
 
@@ -19,7 +21,7 @@ const DynamicCell = ({ cell }) => {
   }
 
   return (
-    <td {...cell.getCellProps()} onDoubleClick={() => notEditable()} onKeyDown={handleKeyDown} onMouseLeave={() => setIsEdit(false)}>
+    <td {...cell.getCellProps()} onDoubleClick={() => notEditable()} onKeyDown={handleKeyDown} onMouseLeave={() => {setIsEdit(false); setEditRow(false)}}>
       {isEdit ? cell.render('EditCell', {setIsEdit}) : cell.render('Cell')}
     </td>
   )

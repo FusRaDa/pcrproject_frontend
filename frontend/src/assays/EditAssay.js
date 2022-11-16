@@ -22,11 +22,9 @@ const EditAssay = () => {
   let [search, setSearch] = useState("")
   let [addedAssays, setAddedAssays] = useState(location.state.assay.assay)
 
-
   let updateAssay = async (e) => {
     e.preventDefault()
     let data = {}
-    console.log(addedAssays)
 
     if (e.target.type !== undefined) {
       //individual assay
@@ -140,7 +138,7 @@ const EditAssay = () => {
                 <Form.Label>Assay Code</Form.Label>
                 <Form.Control name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
               </Form.Group>
- 
+
               <ListGroup>
                 {addedAssays.map(assay => (
                   <ListGroup.Item action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>

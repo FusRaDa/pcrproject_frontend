@@ -106,7 +106,7 @@ const CreateAssay = () => {
                   <option>RNA</option>
                   <option>Total nucleic</option>
                 </Form.Select>
-                Refer to a list of reagents and supplies and add to assay
+                Refer to a list of reagents and supplies and add to assay - not implemented yet
               </Form.Group>
               <Button type="submit">Add Assay</Button>
             </Form>}
@@ -135,10 +135,9 @@ const CreateAssay = () => {
           </Container>
         </Col>
 
-
         <Col>
           {individual && <Container>
-            List of Reagents and Supplies to add
+            List of Reagents and Supplies to add - not implemented yet
           </Container>}
 
           {!individual && 
@@ -146,7 +145,7 @@ const CreateAssay = () => {
             <Form className="d-flex" onChange={() => searchAssay()}>
               <Form.Control
                 type="search"
-                placeholder="Search for Individual Assays"
+                placeholder="Search for Individual Assays to Group Together"
                 id="search"
               />
             </Form>

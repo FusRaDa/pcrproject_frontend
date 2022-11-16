@@ -23,6 +23,7 @@ export const BatchProvider = ({children}) => {
     let data = await response.json()
     if(response.status === 200) {
       setBatches(data)
+      console.log(data)
     } else if (response.statusText === 'Unauthorized') {
       logoutUser()
     }

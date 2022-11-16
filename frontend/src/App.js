@@ -23,7 +23,7 @@ function App() {
             <Route element={<PrivateRoute/>}>
 
               <Route element={<ListBatch/>} path="/" exact />
-           
+
               <Route element={<ListAssay/>} path="/assay" exact/>
               <Route element={<CreateAssay/>} path="/assay/create" exact/>
               <Route element={<EditAssay/>} path="/assay/edit/:pk" exact/>

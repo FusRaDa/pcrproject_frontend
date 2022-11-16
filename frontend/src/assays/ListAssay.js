@@ -1,5 +1,10 @@
 import React, { useState, useContext} from 'react'
 import { useNavigate } from "react-router-dom"
+import AssayContext from '../context/AssayContext'
+
+//styles
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Popover from 'react-bootstrap/Popover';
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
@@ -7,8 +12,6 @@ import Container from "react-bootstrap/esm/Container"
 import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/esm/Button'
 import Card from 'react-bootstrap/Card';
-
-import AssayContext from '../context/AssayContext'
 
 const ListAssay = () => {
 
@@ -22,19 +25,22 @@ const ListAssay = () => {
 
   const navigate = useNavigate()
 
-  // let chooseAssay = (pk) => {
-  //   for (let i=0; i<assays.length; i++) {
-  //     //ignore eslint warning
-  //     // eslint-disable-next-line
-  //     if (assays[i].pk == pk) {
-  //       setViewAssay(assays[i])
-  //     }
-  //   }
-  // }
-
   let searchAssay = () => {
     let data = document.getElementById('search').value
     setSearch(data.toLowerCase())
+  }
+
+  let popover = (title, info) => {
+    return (
+      <Popover>
+        <Popover.Header style={{backgroundColor: 'red'}}>
+          {title}
+        </Popover.Header>
+        <Popover.Body>
+          {info}
+        </Popover.Body>
+      </Popover>
+    )
   }
 
   return (
@@ -42,9 +48,17 @@ const ListAssay = () => {
       <Row>
         <Col>
           <Container>
+
+            <OverlayTrigger placement='bottom' 
+              overlay={popover("Individual vs Group Assays", "Individual assays consist of one assay with a list of reagents and supplies. " + 
+              "Group assays consist of multiple assays under one name and code and does not have a list of reagents and supplies.")}>
+              <Button onClick={() => setGroupAssays(!groupAssays)}>{!groupAssays ? "View Group Assays" : "View Individual Assays"}</Button>
+            </OverlayTrigger>
       
-            <Button onClick={() => setGroupAssays(!groupAssays)}>{!groupAssays ? "View Group Assays" : "View Individual Assays"}</Button>
-            <Button onClick={() => navigate('/assay/create')}>Create Individual Assay</Button>
+            <OverlayTrigger placement='bottom'
+              overlay={popover("Create an Assay", "You may create an individual or group assay. For individual assays: select reagents and supplies. For group assays: select assays to group up")}>
+              <Button onClick={() => navigate('/assay/create')}>Create Individual Assay</Button>
+            </OverlayTrigger>
 
             <Form className="d-flex" onChange={() => searchAssay()}>
               <Form.Control

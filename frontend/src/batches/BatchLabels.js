@@ -1,34 +1,13 @@
-import React, { useContext, useState, useEffect } from "react"
+import React, { useContext } from "react"
 import AuthContext from "../context/AuthContext"
 import Row from 'react-bootstrap/Row'
+import BatchContext from "../context/BatchContext"
+import Col from 'react-bootstrap/Col';
+import Container from "react-bootstrap/Container";
 
 const BatchLabels = () => {
   let {authTokens} = useContext(AuthContext)
-  let [fields, setFields] = useState([])
-  let [change, setChange] = useState(false)
-
-  useEffect(() => {
-    getLabels()
-    // eslint-disable-next-line
-  }, [change])
-
-  let getLabels = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/labels/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-      },
-    })
-    let data = await response.json()
-    if(response.status === 200) {
-      setFields(data)
-      console.log(data)
-      setChange(false)
-    } else {
-      alert('error')
-    }
-  }
+  let {labels, setUpdating} = useContext(BatchContext)
 
   let addLabel = async (e) => {
     e.preventDefault()
@@ -44,8 +23,8 @@ const BatchLabels = () => {
       })
       if(response.status === 201) {
         console.log('label added successfully')
-        setChange(true)
         document.getElementById("add_label").value = ""
+        setUpdating(true)
       } else {
         alert('Column Name Already Exists')
       }
@@ -66,7 +45,7 @@ const BatchLabels = () => {
       })
       if(response.status === 204) {
         console.log('label deleted')
-        setChange(true)
+        setUpdating(true)
       } else {
         alert('error')
       }
@@ -90,6 +69,7 @@ const BatchLabels = () => {
       })
       if(response.status === 200) {
         console.log('label updated')
+        setUpdating(true)
       } else {
         alert('error')
       }
@@ -136,8 +116,8 @@ const BatchLabels = () => {
   //only allows a label to be updated one at a time
   let notUpdating = () => {
     let list = []
-    fields.map(field => (
-      list.push(document.getElementById(field.pk).readOnly)
+    labels.map(label => (
+      list.push(document.getElementById(label.pk).readOnly)
     ))
     if (list.every(element => element === true)) {
       return true
@@ -157,23 +137,24 @@ const BatchLabels = () => {
   }
 
   return (
-    <div>
-      {fields.map(field => (
-        <Row key={field.pk}>
+    <Container>
+      {labels.map(label => (
+        <Col key={label.pk}>
           <form onSubmit={updateLabelEnter}>
-              <input name="field" type="text" id={field.pk} defaultValue={spaceLabels(field.label)} readOnly/>
-              <input type="button" id={`button_${field.pk}`} defaultValue="Edit" onClick={() => editFields(field.pk)} />              
-              <input type="button" defaultValue="Delete" onClick={() => deleteLabel(field.pk)} />
+              <input name="field" type="text" id={label.pk} defaultValue={spaceLabels(label.label)} readOnly/>
+              <input type="button" id={`button_${label.pk}`} defaultValue="Edit" onClick={() => editFields(label.pk)} />              
+              <input type="button" defaultValue="Delete" onClick={() => deleteLabel(label.pk)} />
           </form>
-        </Row>
+        </Col>
       ))}
+      
       <Row>
         <form onSubmit={addLabel}>
           <input type="text" id="add_label" name="label" placeholder="Enter New Column"/>
           <input type="submit"/>
         </form>
       </Row>
-    </div>
+    </Container>
   )
 }
 

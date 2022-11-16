@@ -148,7 +148,7 @@ const CreateBatch = () => {
               </Form.Group>
               <Form.Group>
                 <Form.Label>Number Of Samples</Form.Label>
-                <Form.Control id="samples"  name="samples" type="text" placeholder="Enter Number of Samples"/>
+                <Form.Control id="samples" required={true} name="samples" type="text" placeholder="Enter Number of Samples"/>
               </Form.Group>
               <Form.Group>
                 <Form.Label>DNA Extraction Group</Form.Label>
@@ -199,7 +199,7 @@ const CreateBatch = () => {
               .filter(assay => assay.assay.length === 0)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
-                <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
+                <ListGroup.Item action variant="secondary" key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
                   {assay.name}
                 </ListGroup.Item>
             ))}
@@ -210,7 +210,7 @@ const CreateBatch = () => {
               .filter(assay => assay.assay.length > 1)
               .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
               .map(assay => (
-                <ListGroup.Item action key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
+                <ListGroup.Item action variant="secondary" key={assay.pk} onClick={() => chooseAssay(assay.pk)}>
                   {assay.name}
                 </ListGroup.Item>
             ))}

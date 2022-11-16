@@ -42,7 +42,7 @@ const EditableCell = ({ cell, value: initialValue, setIsEdit}) => {
       alert('error')
     }
   } 
-
+  
   const onChange = e => {
     setValue(e.target.value)
   }
@@ -59,7 +59,7 @@ const EditableCell = ({ cell, value: initialValue, setIsEdit}) => {
     setBatch(cell.row.original)
   }, [initialValue, cell])
 
-  return <input defaultValue={value} onChange={onChange} onKeyDown={handleKeyDown} onBlur={() => setIsEdit(false)}/>
+  return <input style={{width: '100px'}} defaultValue={value} onChange={onChange} onKeyDown={handleKeyDown} onBlur={() => setIsEdit(false)}/>
 }
 
 export default EditableCell

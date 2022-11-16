@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useTable, useFilters, usePagination, useColumnOrder, useExpanded } from 'react-table'
 import DefaultColumnFilter from './DefaultColumnFilter'
 import FuzzyTextFilterFn from './FuzzyTextFilterFn'
@@ -68,6 +68,8 @@ const Styles = styled.div`
 FuzzyTextFilterFn.autoRemove = val => !val
 
 const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loading, pageCount: controlledPageCount }) => {
+
+  let [editRow, setEditRow] = useState(false)
 
   const filterTypes = useMemo(() => ({
       // Add a new fuzzyTextFilterFn filter type.
@@ -144,23 +146,20 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
     setColumnOrder(visibleColumns.map(d => d.id))
   }
 
-  let expandRow = (row) => {
-    if (row.isExpanded) {
-      row.toggleRowExpanded()
-    } else {
+  let handleRowClicked = (row, i) => {
+    if (!editRow) {
+      setRowClicked(i)
       toggleAllRowsExpanded(false)
       row.toggleRowExpanded()
     }
-  }
-
-  let handleRowClicked = (i) => {
-    if (i !== rowClicked) {
-      setRowClicked(i)
-    } else {
+  
+    if (i === rowClicked && row.isExpanded) {
       setRowClicked(null)
+      toggleAllRowsExpanded(false)
     }
   }
 
+ 
   useEffect(() => {
     fetchData({ pageIndex, pageSize })
   }, [fetchData, pageIndex, pageSize])
@@ -194,12 +193,14 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
               return (
                 <React.Fragment key={row.id}>
                   <tr className='batch_row' {...row.getRowProps()} style={{backgroundColor: i === rowClicked ? "grey" : ""}}
-                    onClick={() => { handleRowClicked(i); expandRow(row); }}>
+                    onClick={() => handleRowClicked(row, i)}>
                     {row.cells.map(cell => {
                       return (
                         <DynamicCell 
                           key={cell.column.Header} 
                           cell={cell}
+                          toggleAllRowsExpanded={toggleAllRowsExpanded}
+                          setEditRow={setEditRow}
                         />
                       )
                     })}
@@ -209,9 +210,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
                   <tr>
                     <td colSpan={visibleColumns.length}>
                       <Row>
-                      <Button>Delete</Button>
-                      <Button>View Details</Button>
-               
+                      <Button variant='danger'>Delete</Button>
                       </Row>
                     </td>
                   </tr>
@@ -225,8 +224,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
                 <td colSpan="10000">Loading...</td>
               ) : (
                 <td colSpan="10000">
-                  Showing {page.length} of ~{controlledPageCount * pageSize}{' '}
-                  results
+                  Showing {page.length} of ~{controlledPageCount * pageSize}{' '} results
                 </td>
               )}
             </tr>
