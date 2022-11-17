@@ -39,8 +39,8 @@ const EditAssay = () => {
         'name': e.target.name.value, 
         'code': e.target.code.value,
         'type': e.target.type.value,
-        //TODO
-        // 'reagent_ids': required,
+        'reagent_ids': addedReagents.map(r => r.pk)
+         //TODO
         // 'supply_ids': required,
       }
     } else {
@@ -179,13 +179,10 @@ const EditAssay = () => {
             </Form>
             <Button variant="danger" onClick={() => deleteAssay()}>Delete</Button>
           </Container>}
-
-          
         </Col>
         
 
         <Col>
-
           {location.state.assay.assay.length === 0 && 
           <Container>
             <Card bg='primary' text='light'>
@@ -200,6 +197,7 @@ const EditAssay = () => {
               <ListGroup>
                 {reagents
                   .filter(reagent => !addedReagents.includes(reagent))
+                  .filter(reagent => !addedReagents.map(r => r.pk).includes(reagent.pk))
                   .filter(reagent => search !== null ? reagent.name.toLowerCase().includes(search) || reagent.catalogNumber.includes(search) : reagent)
                   .map(reagent => (
                     <ListGroup.Item variant="secondary" key={reagent.pk} action onClick={() => addReagentToGroup(reagent)}>

@@ -104,6 +104,16 @@ const ListAssay = () => {
                 <ListGroup.Item>Name: {assay.name}</ListGroup.Item>
                 <ListGroup.Item>Code: {assay.code}</ListGroup.Item>
                 <ListGroup.Item>Type: {assay.type}</ListGroup.Item>
+                  {assay.assay.length === 0 && 
+                  <ListGroup>
+                    {assay.reagent.length > 0 ? "Reagents" : ""}
+                    {assay.reagent.map(r => (
+                      <ListGroup.Item key={`reagent_${r.pk}`}>
+                        {r.name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                  }
                   {assay.assay.length > 1 && 
                   <ListGroup>
                     Grouped Assays
