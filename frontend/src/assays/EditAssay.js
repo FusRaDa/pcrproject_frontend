@@ -1,14 +1,19 @@
 import React, { useContext, useState } from "react"
+import { useLocation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+
 import Container from "react-bootstrap/Container"
 import Row from "react-bootstrap/esm/Row"
 import Col from 'react-bootstrap/Col'
 import Button from "react-bootstrap/Button"
 import Form from 'react-bootstrap/Form'
-import { useLocation } from "react-router-dom"
-import { useNavigate } from "react-router-dom"
+import Card from 'react-bootstrap/Card'
+import ListGroup from 'react-bootstrap/ListGroup'
+
 import AuthContext from "../context/AuthContext"
 import AssayContext from "../context/AssayContext"
-import ListGroup from 'react-bootstrap/ListGroup'
+import ReagentContext from "../context/ReagentContext"
+
 
 const EditAssay = () => {
 
@@ -18,9 +23,11 @@ const EditAssay = () => {
 
   let {authTokens} = useContext(AuthContext)
   let {assays, setUpdating} = useContext(AssayContext)
+  let {reagents} = useContext(ReagentContext)
 
   let [search, setSearch] = useState("")
   let [addedAssays, setAddedAssays] = useState(location.state.assay.assay)
+  let [addedReagents, setAddedReagents] = useState(location.state.assay.reagent)
 
   let updateAssay = async (e) => {
     e.preventDefault()
@@ -87,7 +94,15 @@ const EditAssay = () => {
     setAddedAssays(addedAssays => addedAssays.filter(a => a !== assay))
   }
 
-  let searchAssay = () => {
+  let addReagentToGroup = (reagent) => {
+    setAddedReagents(addedReagents => [...addedReagents, reagent])
+  }
+  
+  let removeReagentFromGroup = (reagent) => {
+    setAddedReagents(addedReagents => addedReagents.filter(r => r !== reagent))
+  }
+
+  let searchBar = () => {
     let data = document.getElementById('search').value
     setSearch(data.toLowerCase())
   }
@@ -121,10 +136,21 @@ const EditAssay = () => {
                   {location.state.assay.type==="Total nucleic" && <option>DNA</option>}
                   {location.state.assay.type==="Total nucleic" && <option>RNA</option>}
                 </Form.Select>
-                Refer to a list of reagents and supplies and add to assay
               </Form.Group>
-              <Button type="submit">Update Assay</Button>
+
+              <Card bg='primary' text='light' style={{marginTop: '10px'}}>
+                <Card.Header>Added Reagents</Card.Header>
+                <ListGroup>
+                  {addedReagents.map(reagent => (
+                    <ListGroup.Item variant="secondary" action key={reagent.pk} onClick={() => removeReagentFromGroup(reagent)}>
+                      {`${reagent.catalogNumber}-${reagent.name}`}
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </Card>
+              {addedReagents.length > 0 && <Button type="submit">Update Assay</Button>}
             </Form>
+            <Button variant="danger" onClick={() => deleteAssay()}>Delete</Button>
           </Container>}
 
           {location.state.assay.assay.length > 1 &&
@@ -139,18 +165,22 @@ const EditAssay = () => {
                 <Form.Control name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
               </Form.Group>
 
-              <ListGroup>
-                {addedAssays.map(assay => (
-                  <ListGroup.Item action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>
-                    {`${assay.code}-${assay.name}`}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-              <Button type="submit">Update Assay</Button>
+              <Card bg='primary' text='light' style={{marginTop: '10px'}}>
+                <Card.Header>Reagents</Card.Header>
+                <ListGroup>
+                  {addedAssays.map(assay => (
+                    <ListGroup.Item action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>
+                      {`${assay.code}-${assay.name}`}
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </Card>
+              {addedAssays.length > 0 && <Button type="submit">Update Assay</Button>}
             </Form>
+            <Button variant="danger" onClick={() => deleteAssay()}>Delete</Button>
           </Container>}
 
-          <Button onClick={() => deleteAssay()}>Delete</Button>
+          
         </Col>
         
 
@@ -158,31 +188,53 @@ const EditAssay = () => {
 
           {location.state.assay.assay.length === 0 && 
           <Container>
-            List of Reagents and Supplies to add
+            <Card bg='primary' text='light'>
+              <Card.Header>Reagents</Card.Header>
+              <Form onChange={() => searchBar()}>
+                <Form.Control
+                  type='search'
+                  placeholder="Search for Reagents to Add to Assay"
+                  id="search"/>
+              </Form>
+
+              <ListGroup>
+                {reagents
+                  .filter(reagent => !addedReagents.includes(reagent))
+                  .filter(reagent => search !== null ? reagent.name.toLowerCase().includes(search) || reagent.catalogNumber.includes(search) : reagent)
+                  .map(reagent => (
+                    <ListGroup.Item variant="secondary" key={reagent.pk} action onClick={() => addReagentToGroup(reagent)}>
+                      {`${reagent.catalogNumber}-${reagent.name}`}
+                    </ListGroup.Item>
+                  ))}
+              </ListGroup>
+            </Card>
           </Container>}
 
           {location.state.assay.assay.length > 1 && 
           <Container>
-            <Form className="d-flex" onChange={() => searchAssay()}>
-              <Form.Control
-                type="search"
-                placeholder="Search for Individual Assays"
-                id="search"
-              />
-            </Form>
+            <Card bg='primary' text='light'>
+              <Card.Header>Added Reagents</Card.Header>
+              <Form className="d-flex" onChange={() => searchBar()}>
+                <Form.Control
+                  type="search"
+                  placeholder="Search for Individual Assays"
+                  id="search"
+                />
+              </Form>
 
-            <ListGroup>
-              {assays
-                //allow assays clicked to be edited/details and added to group assay
-                .filter(assay => assay.assay.length === 0)
-                .filter(assay => !addedAssays.map(a => a.pk).includes(assay.pk))
-                .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
-                .map(assay => (
-                  <ListGroup.Item key={assay.pk} action onClick={() => addAssayToGroup(assay)}>
-                    {`${assay.code}-${assay.name}`}
-                  </ListGroup.Item>
-                ))}
-            </ListGroup>
+              <ListGroup>
+                {assays
+                  //allow assays clicked to be edited/details and added to group assay
+                  .filter(assay => assay.assay.length === 0)
+                  .filter(assay => !addedAssays.map(a => a.pk).includes(assay.pk))
+                  .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
+                  .map(assay => (
+                    <ListGroup.Item key={assay.pk} action onClick={() => addAssayToGroup(assay)}>
+                      {`${assay.code}-${assay.name}`}
+                    </ListGroup.Item>
+                  ))}
+              </ListGroup>
+            </Card>
           </Container>}
 
         </Col>

@@ -4,20 +4,28 @@ import PrivateRoute from './utils/PrivateRoute'
 import LoginPage from './pages/LoginPage'
 import Header from './components/Header'
 import React from 'react';
-import { AuthProvider } from './context/AuthContext';
-import { provider, ProviderComposer } from './compose';
-import ListBatch from './batches/ListBatch';
-import { BatchProvider } from './context/BatchContext';
-import { AssayProvider } from './context/AssayContext';
+
 import ListAssay from './assays/ListAssay';
 import CreateAssay from './assays/CreateAssay';
 import EditAssay from './assays/EditAssay';
+import ListBatch from './batches/ListBatch';
+
+import { AuthProvider } from './context/AuthContext';
+import { provider, ProviderComposer } from './compose';
+import { BatchProvider } from './context/BatchContext';
+import { AssayProvider } from './context/AssayContext';
+import { ReagentProvider } from './context/ReagentContext';
 
 function App() {
   return (
     <div className="App">
       <Router>
-        <ProviderComposer providers={[provider(AuthProvider), provider(BatchProvider), provider(AssayProvider)]}>
+        <ProviderComposer providers={[
+            provider(AuthProvider), 
+            provider(BatchProvider), 
+            provider(AssayProvider), 
+            provider(ReagentProvider),
+            ]}>
           <Header/>
           <Routes>
             <Route element={<PrivateRoute/>}>
