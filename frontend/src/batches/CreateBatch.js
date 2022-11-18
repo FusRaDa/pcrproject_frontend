@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 
 import AuthContext from "../context/AuthContext"
 import Col from 'react-bootstrap/Col'
@@ -23,11 +23,35 @@ const CreateBatch = () => {
 
   let [search, setSearch] = useState("")
 
-  let [validated, setValidated] = useState(false)
+  //validation variables for UX
+  let [assayValidated, setAssayValidated] = useState(false)
+  let [samplesValidated, setSamplesValidated] = useState(false)
+  let [sampleNumber, setSampleNumber] = useState(0)
+  let [extGroupValidatedDNA, setExtGroupValidatedDNA] = useState(false)
+  let [extGroupValidatedRNA, setExtGroupValidatedRNA] = useState(false)
+  let [dnaValue, setDNAValue] = useState("")
+  let [rnaValue, setRNAValue] = useState("")
+  let [uniqueErrorDNA, setUniqueErrorDNA] = useState(false)
+  let [uniqueErrorRNA, setUniqueErrorRNA] = useState(false)
 
-  let [errorMessages, setErrorMessages] = useState(null)
+  useEffect(() => {
+    setExtGroupValidatedDNA(false)
+    setExtGroupValidatedRNA(false)
+  }, [selectedAssay])
 
 
+  let resetAllValidations = () => {
+    //set all validations back to false
+    setAssayValidated(false)
+    setSamplesValidated(false)
+    setSampleNumber(0)
+    setExtGroupValidatedDNA(false)
+    setExtGroupValidatedRNA(false)
+    setDNAValue("")
+    setRNAValue("")
+    setUniqueErrorDNA(false)
+    setUniqueErrorRNA(false)
+  }
 
   let validateExtractionGroup = (str) => {
     if (str.length !== 3) {
@@ -36,19 +60,44 @@ const CreateBatch = () => {
     return /^[A-Z]*$/.test(str)
   }
 
+  let validateNumberOfSamples = (num) => {
+    if (num < 1) {
+      return false
+    }
+    return /^[0-9]*$/.test(num)
+  }
+
   let addBatch = async (e) => {
     e.preventDefault()
+    let date = new Date()
 
-    let dnaValue = e.target.dna.value.toUpperCase()
-    let rnaValue = e.target.rna.value.toUpperCase()
-
-    if (!validateExtractionGroup(dnaValue) || !validateExtractionGroup(rnaValue)) {
-      setValidated(true)
+    let validationFailed = false
+    if (selectedAssay === null) {
+      validationFailed = true
+      setAssayValidated(true)
     }
 
-    let date = new Date()
+    if (!validateNumberOfSamples(e.target.samples.value)) {
+      validationFailed = true
+      setSamplesValidated(true)
+    }
+
+    if ((!validateExtractionGroup(dnaValue) && !dna)) {
+      validationFailed = true
+      setExtGroupValidatedDNA(true)
+    }
+
+    if (!validateExtractionGroup(rnaValue) && !rna) {
+      validationFailed = true
+      setExtGroupValidatedRNA(true)
+    }
+
+    if (validationFailed) {
+      return
+    }
+
     let labelData = batchData(e)
- 
+  
     let response = await fetch('http://127.0.0.1:8000/api/batches/create/', {
       method: 'POST',
       headers: {
@@ -64,23 +113,40 @@ const CreateBatch = () => {
         'fieldLabels': labelData
       })
     })
-  
+
     if(response.status === 201) {
       console.log('batch created successfully')
       setUpdating(true)
       clearFields()
-    } else {
-      //TODO: validate in backend for extraction group must be capital letters with length of 
-      setErrorMessages(await response.json())
-      setValidated(true)
-      // alert('error')
+      resetAllValidations()
+    }  
+    
+    if (response.status === 400) { 
+      let errorMessage = await response.json()
+      
+      if (errorMessage.dna_extraction) {
+        setExtGroupValidatedDNA(true)
+        setUniqueErrorDNA(true)
+      }
+
+      if (errorMessage.rna_extraction) {
+        setExtGroupValidatedRNA(true)
+        setUniqueErrorRNA(true)
+      }
+
+      //refer to serializer.py in batch create method
+      if (errorMessage[0] === "Batch cannot share the same extraction groups.") {
+        console.log('same')
+      }
+
+
     }
   }
 
- 
-
   let clearFields = () => {
     setSelectedAssay(null)
+    setDNA(true)
+    setRNA(true)
     document.getElementById('samples').value = ""
     document.getElementById('dna_value').value = ""
     document.getElementById('rna_value').value = ""
@@ -169,13 +235,13 @@ const CreateBatch = () => {
             <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}} noValidate>
               <Form.Group>
                 <Form.Label>Assay</Form.Label>
-                <Form.Control isInvalid={selectedAssay === null ? validated : false} id="assay" required placeholder="Select Assay" disabled defaultValue={selectedAssay === null ? "" : `${selectedAssay.code}-${selectedAssay.name}`}/>
+                <Form.Control isInvalid={selectedAssay !== null ? false : assayValidated} id="assay" required placeholder="Select Assay" disabled defaultValue={selectedAssay === null ? "" : `${selectedAssay.code}-${selectedAssay.name}`}/>
                 <Form.Control.Feedback type='invalid'>Select an assay from the list.</Form.Control.Feedback>
               </Form.Group>
               <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>Number Of Samples</Form.Label>
-                <Form.Control isInvalid={validated} id="samples" required name="samples" type="text" placeholder="Enter Number of Samples"/>
-                <Form.Control.Feedback type='invalid'>Enter number of samples proccessed in batch.</Form.Control.Feedback>
+                <Form.Control isInvalid={validateNumberOfSamples(sampleNumber) ? false : samplesValidated} id="samples" required name="samples" type="text" placeholder="Enter Number of Samples" onChange={(e) => setSampleNumber(e.target.value)}/>
+                <Form.Control.Feedback type='invalid'>Enter number of samples processed in batch.</Form.Control.Feedback>
               </Form.Group>
               <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>DNA Extraction Group</Form.Label>
@@ -184,8 +250,9 @@ const CreateBatch = () => {
                   required={dna===false ? true : false} 
                   placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
                   disabled={dna}
-                  isInvalid={dna ? false : true}/>
-                <Form.Control.Feedback type='invalid'>Enter a unique three letter code.</Form.Control.Feedback>
+                  isInvalid={(validateExtractionGroup(dnaValue) && !uniqueErrorDNA) || dna ? false : extGroupValidatedDNA}
+                  onChange={(e) => setDNAValue(e.target.value)}/>
+                <Form.Control.Feedback type='invalid'>{uniqueErrorDNA ? "Batch with this extraction group already exists" : "Enter a unique three capitalized letter code."}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>RNA/Total-Nucleic Group</Form.Label>
@@ -194,8 +261,9 @@ const CreateBatch = () => {
                   required={rna===false ? true : false} 
                   placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
                   disabled={rna}
-                  isInvalid={rna ? false : true}/>
-                 <Form.Control.Feedback type='invalid'>Enter a unique three letter code.</Form.Control.Feedback>
+                  isInvalid={(validateExtractionGroup(rnaValue) && !uniqueErrorRNA) || rna ? false : extGroupValidatedRNA}
+                  onChange={(e) => setRNAValue(e.target.value)}/>
+                 <Form.Control.Feedback type='invalid'>{uniqueErrorRNA ? "Batch with this extraction group already exists" : "Enter a unique three capitalized letter code."}</Form.Control.Feedback>
               </Form.Group>
             
               <Form.Label style={{marginTop: '15px'}}>Additional Information</Form.Label>
