@@ -23,9 +23,28 @@ const CreateBatch = () => {
 
   let [search, setSearch] = useState("")
 
+  let [validated, setValidated] = useState(false)
+
+  let [errorMessages, setErrorMessages] = useState(null)
+
+
+
+  let validateExtractionGroup = (str) => {
+    if (str.length !== 3) {
+      return false
+    }
+    return /^[A-Z]*$/.test(str)
+  }
 
   let addBatch = async (e) => {
     e.preventDefault()
+
+    let dnaValue = e.target.dna.value.toUpperCase()
+    let rnaValue = e.target.rna.value.toUpperCase()
+
+    if (!validateExtractionGroup(dnaValue) || !validateExtractionGroup(rnaValue)) {
+      setValidated(true)
+    }
 
     let date = new Date()
     let labelData = batchData(e)
@@ -40,19 +59,25 @@ const CreateBatch = () => {
         'assay': selectedAssay, 
         'numberOfSamples': e.target.samples.value, 
         'batchDate': date, 
-        'dna_extraction': dna === true ? null : e.target.dna.value,
-        'rna_extraction': rna === true ? null : e.target.rna.value, 
+        'dna_extraction': dna === true ? null : dnaValue,
+        'rna_extraction': rna === true ? null : rnaValue, 
         'fieldLabels': labelData
       })
     })
+  
     if(response.status === 201) {
       console.log('batch created successfully')
       setUpdating(true)
       clearFields()
     } else {
-      alert('error')
+      //TODO: validate in backend for extraction group must be capital letters with length of 
+      setErrorMessages(await response.json())
+      setValidated(true)
+      // alert('error')
     }
   }
+
+ 
 
   let clearFields = () => {
     setSelectedAssay(null)
@@ -141,40 +166,46 @@ const CreateBatch = () => {
       <Row>
         <Col>
           <Container>
-            <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}}>
+            <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}} noValidate>
               <Form.Group>
                 <Form.Label>Assay</Form.Label>
-                <Form.Control id="assay" disabled value={selectedAssay === null ? "Select Assay" : `${selectedAssay.code}-${selectedAssay.name}`}/>
+                <Form.Control isInvalid={selectedAssay === null ? validated : false} id="assay" required placeholder="Select Assay" disabled defaultValue={selectedAssay === null ? "" : `${selectedAssay.code}-${selectedAssay.name}`}/>
+                <Form.Control.Feedback type='invalid'>Select an assay from the list.</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group>
+              <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>Number Of Samples</Form.Label>
-                <Form.Control id="samples" required={true} name="samples" type="text" placeholder="Enter Number of Samples"/>
+                <Form.Control isInvalid={validated} id="samples" required name="samples" type="text" placeholder="Enter Number of Samples"/>
+                <Form.Control.Feedback type='invalid'>Enter number of samples proccessed in batch.</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group>
+              <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>DNA Extraction Group</Form.Label>
                 <Form.Control 
                   id="dna_value" name="dna" type="text" 
                   required={dna===false ? true : false} 
                   placeholder={dna===true ? "Not Required" : "Enter DNA Extraction Group"} 
-                  disabled={dna}/>
+                  disabled={dna}
+                  isInvalid={dna ? false : true}/>
+                <Form.Control.Feedback type='invalid'>Enter a unique three letter code.</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group>
+              <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>RNA/Total-Nucleic Group</Form.Label>
                 <Form.Control 
                   id="rna_value" name="rna" type="text" 
                   required={rna===false ? true : false} 
                   placeholder={rna===true ? "Not Required" : "Enter RNA/Total Nucleic Extraction Group"} 
-                  disabled={rna}/>
+                  disabled={rna}
+                  isInvalid={rna ? false : true}/>
+                 <Form.Control.Feedback type='invalid'>Enter a unique three letter code.</Form.Control.Feedback>
               </Form.Group>
             
-              <Form.Label>Additional Information</Form.Label>
+              <Form.Label style={{marginTop: '15px'}}>Additional Information</Form.Label>
               {labels.map(label => (
                 <Form.Group key={label.pk}>
                   <Form.Control
                     id={`label_${label.pk}`}
                     type="text"
                     name="info"
-                    placeholder={`Enter ${label.label} Information`}
+                    placeholder={`Enter ${label.label} Information (Optional)`}
                   />
                 </Form.Group>
                 ))}

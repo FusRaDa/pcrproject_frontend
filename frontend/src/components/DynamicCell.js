@@ -5,7 +5,7 @@ const DynamicCell = ({ cell, toggleAllRowsExpanded, setEditRow }) => {
 
   let notEditable = () => {
     //these column cannot be edited
-    if (cell.column.id === 'assay.name' || cell.column.id === 'assay.code' || cell.value === null) {
+    if (cell.column.id === 'assay.name' || cell.column.id === 'assay.code' || cell.column.id === 'batchDate' || cell.value === null) {
       alert('cannot change this cell')
     } else {
       setIsEdit(true)

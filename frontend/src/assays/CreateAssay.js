@@ -25,6 +25,8 @@ const CreateAssay = () => {
   let [addedAssays, setAddedAssays] = useState([])
   let [addedReagents, setAddedReagents] = useState([])
 
+  let [validated, setValidated] = useState(false)
+
   let addAssayToGroup = (assay) => {
     setAddedAssays(addedAssays => [...addedAssays, assay])
   }
@@ -41,15 +43,9 @@ const CreateAssay = () => {
     setAddedReagents(addedReagents => addedReagents.filter(r => r !== reagent))
   }
 
-
   let addAssay = async (e) => {
     e.preventDefault()
     
-    if (addedAssays.length === 0 && !individual) {
-      alert('grouped assays cannot contain only one assay')
-      return
-    }
-
     let data = {}
 
     //if form is for individual assay use this data, else use the latter data for group assays
@@ -85,7 +81,8 @@ const CreateAssay = () => {
       setUpdating(true)
       navigate('/assay')
     } else {
-      alert('error')
+      // alert('error')
+      setValidated(true)
     }
   }
 
@@ -97,6 +94,7 @@ const CreateAssay = () => {
   let handleSwitch = () => {
     setIndividual(!individual)
     setSearch("")
+    setValidated(false)
   }
 
   return (
@@ -107,23 +105,26 @@ const CreateAssay = () => {
 
             {individual && 
             <Container>
-              <Form onSubmit={addAssay}>
+              <Form noValidate validated={validated} onSubmit={addAssay}>
                 <Form.Group>
                   <Form.Label>Assay Name</Form.Label>
-                  <Form.Control name="name" type="text" placeholder="Enter name of assay" />
+                  <Form.Control required name="name" type="text" placeholder="Enter name of assay" />
+                  <Form.Control.Feedback type='invalid'>Assay must have a name.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Assay Code</Form.Label>
-                  <Form.Control name="code" type="text" placeholder="Enter code of assay" />
+                  <Form.Control required name="code" type="text" placeholder="Enter code of assay" />
+                  <Form.Control.Feedback type='invalid'>Assay must have a code.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Assay Type</Form.Label>
-                  <Form.Select name="type">
-                    <option>Select Type</option>
-                    <option>DNA</option>
-                    <option>RNA</option>
-                    <option>Total nucleic</option>
+                  <Form.Select required name="type">
+                    <option value="">Select Type</option>
+                    <option value="DNA">DNA</option>
+                    <option value="RNA">RNA</option>
+                    <option value="Total nucleic">Total nucleic</option>
                   </Form.Select>
+                  <Form.Control.Feedback type='invalid'>Choose a type.</Form.Control.Feedback>
                 </Form.Group>
 
                 <Card bg='primary' text='light' style={{marginTop: '10px'}}>
@@ -143,14 +144,16 @@ const CreateAssay = () => {
 
             {!individual && 
             <Container>
-              <Form onSubmit={addAssay}>
+              <Form noValidate validated={validated} onSubmit={addAssay}>
                 <Form.Group>
                   <Form.Label>Assay Name</Form.Label>
-                  <Form.Control name="name" type="text" placeholder="Enter name of assay" />
+                  <Form.Control required name="name" type="text" placeholder="Enter name of assay" />
+                  <Form.Control.Feedback type='invalid'>Assay must have a name.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Assay Code</Form.Label>
-                  <Form.Control name="code" type="text" placeholder="Enter code of assay" />
+                  <Form.Control required name="code" type="text" placeholder="Enter code of assay" />
+                  <Form.Control.Feedback type='invalid'>Assay must have a code.</Form.Control.Feedback>
                 </Form.Group>
 
                 <Card bg='primary' text='light' style={{marginTop: '10px'}}>
@@ -163,7 +166,7 @@ const CreateAssay = () => {
                     ))}
                   </ListGroup>
                 </Card>
-                {addedAssays.length > 0 && <Button type="submit">Add Assay</Button>}
+                {addedAssays.length > 1 && <Button type="submit">Add Assay</Button>}
               </Form>
             </Container>}
         </Col>
