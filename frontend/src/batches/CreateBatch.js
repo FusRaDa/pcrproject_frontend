@@ -33,6 +33,7 @@ const CreateBatch = () => {
   let [rnaValue, setRNAValue] = useState("")
   let [uniqueErrorDNA, setUniqueErrorDNA] = useState(false)
   let [uniqueErrorRNA, setUniqueErrorRNA] = useState(false)
+  let [sameExtGroup, setSameExtGroup] = useState(false)
 
   useEffect(() => {
     setExtGroupValidatedDNA(false)
@@ -51,6 +52,7 @@ const CreateBatch = () => {
     setRNAValue("")
     setUniqueErrorDNA(false)
     setUniqueErrorRNA(false)
+    setSameExtGroup(false)
   }
 
   let validateExtractionGroup = (str) => {
@@ -137,9 +139,8 @@ const CreateBatch = () => {
       //refer to serializer.py in batch create method
       if (errorMessage[0] === "Batch cannot share the same extraction groups.") {
         console.log('same')
+        setSameExtGroup(true)
       }
-
-
     }
   }
 
@@ -252,7 +253,12 @@ const CreateBatch = () => {
                   disabled={dna}
                   isInvalid={(validateExtractionGroup(dnaValue) && !uniqueErrorDNA) || dna ? false : extGroupValidatedDNA}
                   onChange={(e) => setDNAValue(e.target.value)}/>
-                <Form.Control.Feedback type='invalid'>{uniqueErrorDNA ? "Batch with this extraction group already exists" : "Enter a unique three capitalized letter code."}</Form.Control.Feedback>
+                <Form.Control.Feedback type='invalid'>
+                  {
+                  sameExtGroup ? "Batch cannot share the same extraction groups." : 
+                  uniqueErrorDNA ?  "Batch with this extraction group already exists" : "Enter a unique three capitalized letter code."
+                  }
+                </Form.Control.Feedback>
               </Form.Group>
               <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>RNA/Total-Nucleic Group</Form.Label>
@@ -263,7 +269,12 @@ const CreateBatch = () => {
                   disabled={rna}
                   isInvalid={(validateExtractionGroup(rnaValue) && !uniqueErrorRNA) || rna ? false : extGroupValidatedRNA}
                   onChange={(e) => setRNAValue(e.target.value)}/>
-                 <Form.Control.Feedback type='invalid'>{uniqueErrorRNA ? "Batch with this extraction group already exists" : "Enter a unique three capitalized letter code."}</Form.Control.Feedback>
+                <Form.Control.Feedback type='invalid'>
+                  {
+                  sameExtGroup ? "Batch cannot share the same extraction groups." : 
+                  uniqueErrorRNA ? "Batch with this extraction group already exists" : "Enter a unique three capitalized letter code."
+                  }
+                </Form.Control.Feedback>
               </Form.Group>
             
               <Form.Label style={{marginTop: '15px'}}>Additional Information</Form.Label>
