@@ -29,8 +29,52 @@ const EditAssay = () => {
   let [addedAssays, setAddedAssays] = useState(location.state.assay.assay)
   let [addedReagents, setAddedReagents] = useState(location.state.assay.reagent)
 
+  let [nameValidated, setNameValidated] = useState(false)
+  let [uniqueErrorName, setUniqueErrorName] = useState(false)
+  let [codeValidated, setCodeValidated] = useState(false)
+  let [uniqueErrorCode, setUniqueErrorCode] = useState(false)
+
+  let resetAllValidations = () => {
+    setNameValidated(false)
+    setUniqueErrorName(false)
+    setCodeValidated(false)
+    setUniqueErrorCode(false)
+  }
+
+  let validateName = (str) => {
+    if (str === "") {
+      return false
+    } 
+    return true
+  }
+
+  let validateCode = (str) => {
+    if (str === "") {
+      return false
+    }
+    return true
+  }
+
   let updateAssay = async (e) => {
     e.preventDefault()
+    resetAllValidations()
+
+    let validationFailed = false
+
+    if (!validateName(e.target.name.value)) {
+      setNameValidated(true)
+      validationFailed = true
+    }
+
+    if (!validateCode(e.target.code.value)) {
+      setCodeValidated(true)
+      validationFailed = true
+    }
+
+    if (validationFailed) {
+      return
+    }
+
     let data = {}
 
     if (e.target.type !== undefined) {
@@ -60,12 +104,27 @@ const EditAssay = () => {
       },
       body: JSON.stringify(data)
     })
-    if(response.status === 200) {
+
+    if (response.status === 200) {
       console.log('batch updated')
       setUpdating(true)
       navigate('/assay')
-    } else {
-      alert('error')
+    } 
+    
+    if (response.status === 400) {
+      let errorMessage = await response.json()
+
+      //refer to update serializer in AssaySerializer
+      if (errorMessage.name) {
+        setNameValidated(true)
+        setUniqueErrorName(true)
+      }
+
+      if (errorMessage.code) {
+        setCodeValidated(true)
+        setUniqueErrorCode(true)
+      }
+      
     }
   } 
 
@@ -112,16 +171,19 @@ const EditAssay = () => {
       <Row>
         <Col>
           
+          {/* UI for individual assays */}
           {location.state.assay.assay.length === 0 && 
           <Container>
             <Form onSubmit={updateAssay}>
               <Form.Group>
                 <Form.Label>Assay Name</Form.Label>
-                <Form.Control name="name" type="text" placeholder="Enter name of assay" defaultValue={location.state.assay.name}/>
+                <Form.Control isInvalid={nameValidated} name="name" type="text" placeholder="Enter name of assay" defaultValue={location.state.assay.name}/>
+                <Form.Control.Feedback type="invalid">{nameValidated && !uniqueErrorName ? "Assay must have a name." : "Assay with this name already exists."}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Code</Form.Label>
-                <Form.Control name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
+                <Form.Control isInvalid={codeValidated} name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
+                <Form.Control.Feedback type="invalid">{codeValidated && !uniqueErrorCode ? "Assay must have a code" : "Assay with this code already exists."}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Type</Form.Label>
@@ -153,6 +215,7 @@ const EditAssay = () => {
             <Button variant="danger" onClick={() => deleteAssay()}>Delete</Button>
           </Container>}
 
+          {/* UI for group assays */}
           {location.state.assay.assay.length > 1 &&
           <Container> 
             <Form onSubmit={updateAssay}>

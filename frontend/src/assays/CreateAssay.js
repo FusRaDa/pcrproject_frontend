@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Container from "react-bootstrap/esm/Container"
 import Row from "react-bootstrap/Row"
@@ -25,7 +25,13 @@ const CreateAssay = () => {
   let [addedAssays, setAddedAssays] = useState([])
   let [addedReagents, setAddedReagents] = useState([])
 
-  let [validated, setValidated] = useState(false)
+  //validations
+  let [nameValidated, setNameValidated] = useState(false)
+  let [uniqueErrorName, setUniqueErrorName] = useState(false)
+  let [codeValidated, setCodeValidated] = useState(false)
+  let [uniqueErrorCode, setUniqueErrorCode] = useState(false)
+  let [typeValidated, setTypeValidated] = useState(false)
+ 
 
   let addAssayToGroup = (assay) => {
     setAddedAssays(addedAssays => [...addedAssays, assay])
@@ -43,8 +49,65 @@ const CreateAssay = () => {
     setAddedReagents(addedReagents => addedReagents.filter(r => r !== reagent))
   }
 
+  useEffect(() => {
+    resetAllValidations()
+    setAddedAssays([])
+    setAddedReagents([])
+  }, [individual])
+
+  let resetAllValidations = () => {
+    setNameValidated(false)
+    setUniqueErrorName(false)
+    setCodeValidated(false)
+    setUniqueErrorCode(false)
+    setTypeValidated(false)
+  }
+
+  let validateName = (str) => {
+    if (str === "") {
+      return false
+    } 
+    return true
+  }
+
+  let validateCode = (str) => {
+    if (str === "") {
+      return false
+    }
+    return true
+  }
+
+  let validateType = (str) => {
+    if (str === "") {
+      return false
+    }
+    return true
+  }
+
   let addAssay = async (e) => {
     e.preventDefault()
+    resetAllValidations()
+
+    let validationFailed = false
+
+    if (!validateName(e.target.name.value)) {
+      setNameValidated(true)
+      validationFailed = true
+    }
+
+    if (!validateCode(e.target.code.value)) {
+      setCodeValidated(true)
+      validationFailed = true
+    }
+
+    if (!validateType(e.target.type.value)) {
+      setTypeValidated(true)
+      validationFailed = true
+    }
+
+    if (validationFailed) {
+      return
+    }
     
     let data = {}
 
@@ -67,7 +130,7 @@ const CreateAssay = () => {
         'assay_ids' : addedAssays.map(a => a.pk)
       }
     }
-    
+
     let response = await fetch('http://127.0.0.1:8000/api/assays/create/', {
       method: 'POST',
       headers: {
@@ -76,13 +139,25 @@ const CreateAssay = () => {
       },
       body: JSON.stringify(data)
     })
-    if(response.status === 201) {
+
+    if (response.status === 201) {
       console.log('assay created successfully')
       setUpdating(true)
       navigate('/assay')
-    } else {
-      // alert('error')
-      setValidated(true)
+    } 
+
+    if (response.status === 400) {
+      let errorMessage = await response.json()
+
+      if (errorMessage.name) {
+        setUniqueErrorName(true)
+        setNameValidated(true)
+      }
+
+      if (errorMessage.code) {
+        setUniqueErrorCode(true)
+        setCodeValidated(true)
+      }
     }
   }
 
@@ -94,7 +169,6 @@ const CreateAssay = () => {
   let handleSwitch = () => {
     setIndividual(!individual)
     setSearch("")
-    setValidated(false)
   }
 
   return (
@@ -105,20 +179,20 @@ const CreateAssay = () => {
 
             {individual && 
             <Container>
-              <Form noValidate validated={validated} onSubmit={addAssay}>
+              <Form noValidate onSubmit={addAssay}>
                 <Form.Group>
                   <Form.Label>Assay Name</Form.Label>
-                  <Form.Control required name="name" type="text" placeholder="Enter name of assay" />
-                  <Form.Control.Feedback type='invalid'>Assay must have a name.</Form.Control.Feedback>
+                  <Form.Control required isInvalid={nameValidated} name="name" type="text" placeholder="Enter name of assay"/>
+                  <Form.Control.Feedback type='invalid'>{nameValidated && !uniqueErrorName ? "Assay must have a name." : "Assay with this name already exists."}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Assay Code</Form.Label>
-                  <Form.Control required name="code" type="text" placeholder="Enter code of assay" />
-                  <Form.Control.Feedback type='invalid'>Assay must have a code.</Form.Control.Feedback>
+                  <Form.Control required isInvalid={codeValidated} name="code" type="text" placeholder="Enter code of assay" />
+                  <Form.Control.Feedback type='invalid'>{codeValidated && !uniqueErrorCode ? "Assay must have a code." : "Assay with this code already exists."}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group>
                   <Form.Label>Assay Type</Form.Label>
-                  <Form.Select required name="type">
+                  <Form.Select isInvalid={typeValidated} required name="type">
                     <option value="">Select Type</option>
                     <option value="DNA">DNA</option>
                     <option value="RNA">RNA</option>
@@ -144,7 +218,7 @@ const CreateAssay = () => {
 
             {!individual && 
             <Container>
-              <Form noValidate validated={validated} onSubmit={addAssay}>
+              <Form noValidate onSubmit={addAssay}>
                 <Form.Group>
                   <Form.Label>Assay Name</Form.Label>
                   <Form.Control required name="name" type="text" placeholder="Enter name of assay" />
