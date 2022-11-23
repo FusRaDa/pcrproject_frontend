@@ -73,9 +73,7 @@ const BatchLabels = () => {
       } else {
         alert('error')
       }
-    } else {
-      alert('same field name')
-    }
+    } 
   }
 
   //update label by pressing enter
@@ -95,6 +93,7 @@ const BatchLabels = () => {
         console.log('label updated')
         document.getElementById(e.target.field.id).readOnly = true
         document.getElementById(`button_${e.target.field.id}`).defaultValue = 'Edit'
+        setUpdating(true)
       } else {
         alert('error')
       }
@@ -150,7 +149,7 @@ const BatchLabels = () => {
       
       <Row>
         <form onSubmit={addLabel}>
-          <input type="text" id="add_label" name="label" placeholder="Enter New Column"/>
+          <input type="text" required id="add_label" name="label" placeholder="Enter New Column"/>
           <input type="submit"/>
         </form>
       </Row>

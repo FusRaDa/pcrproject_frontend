@@ -157,9 +157,12 @@ const ListBatch = () => {
             Additional Label Columns
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <BatchLabels/>
-        </Modal.Body>
+        <OverlayTrigger placement='bottom' overlay={popover("Manage Columns", "You may add more columns and delete columns." + 
+          " Be aware that changing column names will not show data if there is no previous data pointing to the exact name of column")}>
+          <Modal.Body>
+            <BatchLabels/>
+          </Modal.Body>
+        </OverlayTrigger>
       </Modal>
 
    

@@ -100,7 +100,7 @@ const CreateAssay = () => {
       validationFailed = true
     }
 
-    if (!validateType(e.target.type.value)) {
+    if (e.target.type !== undefined && !validateType(e.target.type.value)) {
       setTypeValidated(true)
       validationFailed = true
     }
@@ -173,133 +173,138 @@ const CreateAssay = () => {
 
   return (
     <Container fluid="md">
-      <Row>
-        <Col>
-          <Button onClick={() => handleSwitch()}>{individual ? "Create Group Assay" : "Create Individual Assay"}</Button>
+      <Button onClick={() => handleSwitch()}>{individual ? "Create Group Assay" : "Create Individual Assay"}</Button>
+      
+      <Card>
+        <Card.Header style={{backgroundColor: 'red', textAlign: 'center'}}>{individual ? "Creating an Individual Assay..." : "Creating a Grouped Assay..."}</Card.Header>
+        <Card.Body>
+          <Row>
+            <Col>
 
-            {individual && 
-            <Container>
-              <Form noValidate onSubmit={addAssay}>
-                <Form.Group>
-                  <Form.Label>Assay Name</Form.Label>
-                  <Form.Control required isInvalid={nameValidated} name="name" type="text" placeholder="Enter name of assay"/>
-                  <Form.Control.Feedback type='invalid'>{nameValidated && !uniqueErrorName ? "Assay must have a name." : "Assay with this name already exists."}</Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Assay Code</Form.Label>
-                  <Form.Control required isInvalid={codeValidated} name="code" type="text" placeholder="Enter code of assay" />
-                  <Form.Control.Feedback type='invalid'>{codeValidated && !uniqueErrorCode ? "Assay must have a code." : "Assay with this code already exists."}</Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Assay Type</Form.Label>
-                  <Form.Select isInvalid={typeValidated} required name="type">
-                    <option value="">Select Type</option>
-                    <option value="DNA">DNA</option>
-                    <option value="RNA">RNA</option>
-                    <option value="Total nucleic">Total nucleic</option>
-                  </Form.Select>
-                  <Form.Control.Feedback type='invalid'>Choose a type.</Form.Control.Feedback>
-                </Form.Group>
+              {individual && 
+              <Container>
+                <Form noValidate onSubmit={addAssay}>
+                  <Form.Group>
+                    <Form.Label>Assay Name</Form.Label>
+                    <Form.Control required isInvalid={nameValidated} name="name" type="text" placeholder="Enter name of assay"/>
+                    <Form.Control.Feedback type='invalid'>{nameValidated && !uniqueErrorName ? "Assay must have a name." : "Assay with this name already exists."}</Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Assay Code</Form.Label>
+                    <Form.Control required isInvalid={codeValidated} name="code" type="text" placeholder="Enter code of assay" />
+                    <Form.Control.Feedback type='invalid'>{codeValidated && !uniqueErrorCode ? "Assay must have a code." : "Assay with this code already exists."}</Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Assay Type</Form.Label>
+                    <Form.Select isInvalid={typeValidated} required name="type">
+                      <option value="">Select Type</option>
+                      <option value="DNA">DNA</option>
+                      <option value="RNA">RNA</option>
+                      <option value="Total nucleic">Total nucleic</option>
+                    </Form.Select>
+                    <Form.Control.Feedback type='invalid'>Choose a type.</Form.Control.Feedback>
+                  </Form.Group>
 
-                <Card bg='primary' text='light' style={{marginTop: '10px'}}>
-                  <Card.Header>Added Reagents</Card.Header>
+                  <Card bg='primary' text='light' style={{marginTop: '10px'}}>
+                    <Card.Header>Added Reagents</Card.Header>
+                    <ListGroup>
+                      {addedReagents.map(reagent => (
+                        <ListGroup.Item variant="secondary" action key={reagent.pk} onClick={() => removeReagentFromGroup(reagent)}>
+                          {`${reagent.catalogNumber}-${reagent.name}`}
+                        </ListGroup.Item>
+                      ))}
+                    </ListGroup>
+                  </Card>
+
+                  {addedReagents.length > 0 && <Button type="submit">Add Assay</Button>}
+                </Form>
+              </Container>}
+
+              {!individual && 
+              <Container>
+                <Form noValidate onSubmit={addAssay}>
+                  <Form.Group>
+                    <Form.Label>Assay Name</Form.Label>
+                    <Form.Control isInvalid={nameValidated} required name="name" type="text" placeholder="Enter name of assay" />
+                    <Form.Control.Feedback type='invalid'>Assay must have a name.</Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group>
+                    <Form.Label>Assay Code</Form.Label>
+                    <Form.Control isInvalid={codeValidated} required name="code" type="text" placeholder="Enter code of assay" />
+                    <Form.Control.Feedback type='invalid'>Assay must have a code.</Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Card bg='primary' text='light' style={{marginTop: '10px'}}>
+                    <Card.Header>Grouped Assays</Card.Header>
+                    <ListGroup>
+                      {addedAssays.map(assay => (
+                        <ListGroup.Item variant="secondary" action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>
+                          {`${assay.code}-${assay.name}`}
+                        </ListGroup.Item>
+                      ))}
+                    </ListGroup>
+                  </Card>
+                  {addedAssays.length > 1 && <Button type="submit">Add Assay</Button>}
+                </Form>
+              </Container>}
+            </Col>
+
+            <Col>
+              {individual && 
+              <Container>
+                <Card bg='primary' text='light'>
+                <Card.Header>Reagents</Card.Header>
+                  <Form onChange={() => searchBar()}>
+                    <Form.Control
+                      type='search'
+                      placeholder="Search for Reagents to Add to Assay"
+                      id="search"/>
+                  </Form>
+
                   <ListGroup>
-                    {addedReagents.map(reagent => (
-                      <ListGroup.Item variant="secondary" action key={reagent.pk} onClick={() => removeReagentFromGroup(reagent)}>
-                        {`${reagent.catalogNumber}-${reagent.name}`}
-                      </ListGroup.Item>
-                    ))}
+                    {reagents
+                      .filter(reagent => !addedReagents.includes(reagent))
+                      .filter(reagent => search !== null ? reagent.name.toLowerCase().includes(search) || reagent.catalogNumber.includes(search) : reagent)
+                      .map(reagent => (
+                        <ListGroup.Item variant="secondary" key={reagent.pk} action onClick={() => addReagentToGroup(reagent)}>
+                          {`${reagent.catalogNumber}-${reagent.name}`}
+                        </ListGroup.Item>
+                      ))}
                   </ListGroup>
                 </Card>
+              </Container>}
 
-                {addedReagents.length > 0 && <Button type="submit">Add Assay</Button>}
-              </Form>
-            </Container>}
-
-            {!individual && 
-            <Container>
-              <Form noValidate onSubmit={addAssay}>
-                <Form.Group>
-                  <Form.Label>Assay Name</Form.Label>
-                  <Form.Control required name="name" type="text" placeholder="Enter name of assay" />
-                  <Form.Control.Feedback type='invalid'>Assay must have a name.</Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Assay Code</Form.Label>
-                  <Form.Control required name="code" type="text" placeholder="Enter code of assay" />
-                  <Form.Control.Feedback type='invalid'>Assay must have a code.</Form.Control.Feedback>
-                </Form.Group>
-
-                <Card bg='primary' text='light' style={{marginTop: '10px'}}>
-                  <Card.Header>Grouped Assays</Card.Header>
+              {!individual && 
+              <Container>
+                <Card bg='primary' text='light'>
+                  <Card.Header>Individual Assays</Card.Header>
+                  <Form className="d-flex" onChange={() => searchBar()}>
+                    <Form.Control
+                      type="search"
+                      placeholder="Search for Individual Assays to Group Together"
+                      id="search"
+                    />
+                  </Form>
+              
                   <ListGroup>
-                    {addedAssays.map(assay => (
-                      <ListGroup.Item variant="secondary" action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>
-                        {`${assay.code}-${assay.name}`}
-                      </ListGroup.Item>
-                    ))}
+                    {assays
+                      //allow assays clicked to be edited/details and added to group assay
+                      .filter(assay => assay.assay.length === 0)
+                      .filter(assay => !addedAssays.includes(assay))
+                      .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
+                      .map(assay => (
+                        <ListGroup.Item variant="secondary" key={assay.pk} action onClick={() => addAssayToGroup(assay)}>
+                          {`${assay.code}-${assay.name}`}
+                        </ListGroup.Item>
+                      ))}
                   </ListGroup>
                 </Card>
-                {addedAssays.length > 1 && <Button type="submit">Add Assay</Button>}
-              </Form>
-            </Container>}
-        </Col>
+              </Container>}
+            </Col>
 
-        <Col>
-          {individual && 
-          <Container>
-            <Card bg='primary' text='light'>
-            <Card.Header>Reagents</Card.Header>
-              <Form onChange={() => searchBar()}>
-                <Form.Control
-                  type='search'
-                  placeholder="Search for Reagents to Add to Assay"
-                  id="search"/>
-              </Form>
-
-              <ListGroup>
-                {reagents
-                  .filter(reagent => !addedReagents.includes(reagent))
-                  .filter(reagent => search !== null ? reagent.name.toLowerCase().includes(search) || reagent.catalogNumber.includes(search) : reagent)
-                  .map(reagent => (
-                    <ListGroup.Item variant="secondary" key={reagent.pk} action onClick={() => addReagentToGroup(reagent)}>
-                      {`${reagent.catalogNumber}-${reagent.name}`}
-                    </ListGroup.Item>
-                  ))}
-              </ListGroup>
-            </Card>
-          </Container>}
-
-          {!individual && 
-          <Container>
-            <Card bg='primary' text='light'>
-              <Card.Header>Individual Assays</Card.Header>
-              <Form className="d-flex" onChange={() => searchBar()}>
-                <Form.Control
-                  type="search"
-                  placeholder="Search for Individual Assays to Group Together"
-                  id="search"
-                />
-              </Form>
-          
-              <ListGroup>
-                {assays
-                  //allow assays clicked to be edited/details and added to group assay
-                  .filter(assay => assay.assay.length === 0)
-                  .filter(assay => !addedAssays.includes(assay))
-                  .filter(assay => search !== null ? assay.name.toLowerCase().includes(search) || assay.code.includes(search) : assay)
-                  .map(assay => (
-                    <ListGroup.Item variant="secondary" key={assay.pk} action onClick={() => addAssayToGroup(assay)}>
-                      {`${assay.code}-${assay.name}`}
-                    </ListGroup.Item>
-                  ))}
-              </ListGroup>
-            </Card>
-          </Container>}
-
-       
-        </Col>
-      </Row>
+          </Row>
+        </Card.Body>
+      </Card>
     </Container>
   )
 }

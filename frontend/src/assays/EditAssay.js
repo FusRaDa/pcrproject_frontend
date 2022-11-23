@@ -110,7 +110,7 @@ const EditAssay = () => {
       setUpdating(true)
       navigate('/assay')
     } 
-    
+
     if (response.status === 400) {
       let errorMessage = await response.json()
 
@@ -177,13 +177,13 @@ const EditAssay = () => {
             <Form onSubmit={updateAssay}>
               <Form.Group>
                 <Form.Label>Assay Name</Form.Label>
-                <Form.Control isInvalid={nameValidated} name="name" type="text" placeholder="Enter name of assay" defaultValue={location.state.assay.name}/>
+                <Form.Control isInvalid={nameValidated} required name="name" type="text" placeholder="Enter name of assay" defaultValue={location.state.assay.name}/>
                 <Form.Control.Feedback type="invalid">{nameValidated && !uniqueErrorName ? "Assay must have a name." : "Assay with this name already exists."}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Code</Form.Label>
-                <Form.Control isInvalid={codeValidated} name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
-                <Form.Control.Feedback type="invalid">{codeValidated && !uniqueErrorCode ? "Assay must have a code" : "Assay with this code already exists."}</Form.Control.Feedback>
+                <Form.Control isInvalid={codeValidated} required name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
+                <Form.Control.Feedback type="invalid">{codeValidated && !uniqueErrorCode ? "Assay must have a code." : "Assay with this code already exists."}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Type</Form.Label>
@@ -201,7 +201,7 @@ const EditAssay = () => {
               </Form.Group>
 
               <Card bg='primary' text='light' style={{marginTop: '10px'}}>
-                <Card.Header>Added Reagents</Card.Header>
+                <Card.Header>Reagents</Card.Header>
                 <ListGroup>
                   {addedReagents.map(reagent => (
                     <ListGroup.Item variant="secondary" action key={reagent.pk} onClick={() => removeReagentFromGroup(reagent)}>
@@ -221,15 +221,17 @@ const EditAssay = () => {
             <Form onSubmit={updateAssay}>
               <Form.Group>
                 <Form.Label>Assay Name</Form.Label>
-                <Form.Control name="name" type="text" placeholder="Enter name of assay" defaultValue={location.state.assay.name}/>
+                <Form.Control isInvalid={nameValidated} required name="name" type="text" placeholder="Enter name of assay" defaultValue={location.state.assay.name}/>
+                <Form.Control.Feedback type="invalid">{nameValidated && !uniqueErrorName ? "Assay must have a name." : "Assay with this name already exists."}</Form.Control.Feedback>
               </Form.Group>
               <Form.Group>
                 <Form.Label>Assay Code</Form.Label>
-                <Form.Control name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
+                <Form.Control isInvalid={codeValidated} required name="code" type="text" placeholder="Enter code of assay" defaultValue={location.state.assay.code}/>
+                <Form.Control.Feedback type="invalid">{codeValidated && !uniqueErrorCode ? "Assay must have a code." : "Assay with this code already exists."}</Form.Control.Feedback>
               </Form.Group>
 
               <Card bg='primary' text='light' style={{marginTop: '10px'}}>
-                <Card.Header>Reagents</Card.Header>
+                <Card.Header>Assays</Card.Header>
                 <ListGroup>
                   {addedAssays.map(assay => (
                     <ListGroup.Item action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>
@@ -249,7 +251,7 @@ const EditAssay = () => {
           {location.state.assay.assay.length === 0 && 
           <Container>
             <Card bg='primary' text='light'>
-              <Card.Header>Reagents</Card.Header>
+              <Card.Header>List of Reagents</Card.Header>
               <Form onChange={() => searchBar()}>
                 <Form.Control
                   type='search'
@@ -274,7 +276,7 @@ const EditAssay = () => {
           {location.state.assay.assay.length > 1 && 
           <Container>
             <Card bg='primary' text='light'>
-              <Card.Header>Added Reagents</Card.Header>
+              <Card.Header>List of Assays</Card.Header>
               <Form className="d-flex" onChange={() => searchBar()}>
                 <Form.Control
                   type="search"
