@@ -35,11 +35,32 @@ const EditableCell = ({ cell, value: initialValue, setIsEdit}) => {
       },
       body: JSON.stringify(data)
     })
-    if(response.status === 200) {
+    
+    if (response.status === 200) {
       console.log('batch updated')
       setUpdating(true)
-    } else {
-      alert('error')
+    } 
+
+    if (response.status === 400) {
+      let errorMessage = await response.json()
+      console.log(errorMessage)
+
+      if (errorMessage.dna_extraction !== undefined) {
+        if (errorMessage.dna_extraction[0] === "Extraction group must be a three capitalized letter field.") {
+          alert("Extraction group must be a three capitalized letter field.")
+        } else {
+          alert("Batch with this extraction group already exists.")
+        }
+      } 
+
+      if (errorMessage.rna_extraction !== undefined) {
+        if (errorMessage.rna_extraction[0] === "Extraction group must be a three capitalized letter field.") {
+          alert("Extraction group must be a three capitalized letter field.")
+        } else {
+          alert("Batch with this extraction group already exists.")
+        }
+      }
+      
     }
   } 
   

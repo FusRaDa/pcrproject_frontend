@@ -12,10 +12,13 @@ export const BatchProvider = ({children}) => {
   let [labels, setLabels] = useState([])
   let [updating, setUpdating] = useState(false)
 
-  let getBatches = async (pageIndex) => {
+  let page = localStorage.getItem('currentPage')
+  let [pageNum, setPageNum] = useState(page)
 
-    if (pageIndex > 0) {
-      let response = await fetch(`http://127.0.0.1:8000/api/batches/?page=${pageIndex + 1}`, {
+  let getBatches = async () => {
+
+    if (pageNum !== null) {
+      let response = await fetch(`http://127.0.0.1:8000/api/batches/?page=${+pageNum + 1}`, {
         method: 'GET',
         headers: {
           'Content-Type':'application/json',
@@ -77,6 +80,7 @@ export const BatchProvider = ({children}) => {
     labels: labels,
     setUpdating: setUpdating,
     updating: updating,
+    setPageNum: setPageNum,
   }
 
   return (

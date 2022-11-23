@@ -16,7 +16,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 
 const ListBatch = () => {
-  let {getBatches, batches, labels} = useContext(BatchContext)
+  let {setPageNum, setUpdating, batches, labels} = useContext(BatchContext)
 
   let [rowClicked, setRowClicked] = useState(null)
   let [columns, setColumns] = useState([])
@@ -32,7 +32,8 @@ const ListBatch = () => {
   let [show, setShow] = useState(false)
 
   let changePage = (pageIndex) => {
-    getBatches(pageIndex)
+    setPageNum(pageIndex)
+    setUpdating(true)
   }
 
   let fetchData = useCallback(() => {

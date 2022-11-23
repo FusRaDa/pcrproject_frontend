@@ -116,7 +116,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
     {
       initialState: {
         hiddenColumns: ['pk'],
-        pageIndex: 0,
+        pageIndex: localStorage.getItem('currentPage') !== null ? +localStorage.getItem('currentPage') : 0,
         columnOrder: JSON.parse(localStorage.getItem('columnOrder'))
         },  
       columns,
@@ -166,6 +166,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
 
   useEffect(() => {
     changePage(pageIndex)
+    localStorage.setItem("currentPage", pageIndex)
     // eslint-disable-next-line
   }, [pageIndex])
 
