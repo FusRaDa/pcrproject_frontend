@@ -16,11 +16,12 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 
 const ListBatch = () => {
-  let {batches, labels} = useContext(BatchContext)
+  let {getBatches, batches, labels} = useContext(BatchContext)
 
   let [rowClicked, setRowClicked] = useState(null)
   let [columns, setColumns] = useState([])
 
+  //pagination
   let [data, setData] = useState([])
   let [loading, setLoading] = useState(false)
   let [pageCount, setPageCount] = useState(0)
@@ -30,15 +31,17 @@ const ListBatch = () => {
 
   let [show, setShow] = useState(false)
 
-  let fetchData = useCallback(({ pageSize, pageIndex }) => {
+  let changePage = (pageIndex) => {
+    getBatches(pageIndex)
+  }
+
+  let fetchData = useCallback(() => {
     const fetchId = ++fetchIdRef.current
 
     setLoading(true)
 
     if (Object.keys(batches).length !== 0 && fetchId === fetchIdRef.current) {
-      const startRow = pageSize * pageIndex
-      const endRow = startRow + pageSize
-      setData(batches.results.slice(startRow, endRow))
+      setData(batches.results)
       setPageCount(batches.total_pages)
       setLoading(false)
       }
@@ -140,6 +143,7 @@ const ListBatch = () => {
               pageCount={pageCount}
               isEdit={isEdit}
               setIsEdit={setIsEdit}
+              changePage={changePage}
             />
           </Col>
         </OverlayTrigger>

@@ -8,6 +8,7 @@ import DynamicCell from './DynamicCell'
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 
+
 const Styles = styled.div`
   display: block;
   max-width: 100%;
@@ -67,7 +68,7 @@ const Styles = styled.div`
 //remove filter if search is empty
 FuzzyTextFilterFn.autoRemove = val => !val
 
-const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loading, pageCount: controlledPageCount }) => {
+const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loading, pageCount: controlledPageCount, changePage }) => {
 
   let [editRow, setEditRow] = useState(false)
 
@@ -110,8 +111,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
     gotoPage,
     nextPage,
     previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize }
+    state: { pageIndex }
   } = useTable(
     {
       initialState: {
@@ -125,6 +125,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
       filterTypes,
       manualPagination: true,
       pageCount: controlledPageCount,
+      autoResetPage: false
     },
     useExpanded,
     useFilters,
@@ -159,10 +160,14 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
     }
   }
 
- 
   useEffect(() => {
-    fetchData({ pageIndex, pageSize })
-  }, [fetchData, pageIndex, pageSize])
+    fetchData()
+  }, [fetchData])
+
+  useEffect(() => {
+    changePage(pageIndex)
+    // eslint-disable-next-line
+  }, [pageIndex])
 
 
   return (
@@ -175,8 +180,8 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
                 {headerGroup.headers.map(column => (
                   <th {...column.getHeaderProps()}>
                     <div>
-                      {visibleColumns.indexOf(column) !== 0 && <button onClick={() => moveColumnLeft(column)}>left</button> }
-                      {visibleColumns.indexOf(column) !== visibleColumns.length - 1 && <button onClick={() => moveColumnRight(column)}>right</button>}
+                      {visibleColumns.indexOf(column) !== 0 && <button onClick={() => moveColumnLeft(column)}>{'\u25C0'}</button>}
+                      {visibleColumns.indexOf(column) !== visibleColumns.length - 1 && <button onClick={() => moveColumnRight(column)}>{'\u25B6'}</button>}
                     </div>
                     {column.render('Header')}
                     {/* column filter */}
@@ -224,7 +229,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
                 <td colSpan="10000">Loading...</td>
               ) : (
                 <td colSpan="10000">
-                  Showing {page.length} of ~{controlledPageCount * pageSize}{' '} results
+                  Showing {page.length} results
                 </td>
               )}
             </tr>
@@ -262,18 +267,6 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
             style={{ width: '100px' }}
           />
           </span>{' '}
-          <select
-            value={pageSize}
-            onChange={e => {
-              setPageSize(Number(e.target.value))
-            }}
-          >
-            {[10, 20, 30, 40, 50].map(pageSize => (
-              <option key={pageSize} value={pageSize}>
-                Show {pageSize}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
     </Styles>

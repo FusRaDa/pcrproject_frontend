@@ -12,20 +12,38 @@ export const BatchProvider = ({children}) => {
   let [labels, setLabels] = useState([])
   let [updating, setUpdating] = useState(false)
 
-  let getBatches = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/batches/', {
-      method: 'GET',
-      headers: {
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
+  let getBatches = async (pageIndex) => {
+
+    if (pageIndex > 0) {
+      let response = await fetch(`http://127.0.0.1:8000/api/batches/?page=${pageIndex + 1}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type':'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+        }
+      })
+      let data = await response.json()
+      if(response.status === 200) {
+        setBatches(data)
+        console.log(data)
+      } else if (response.statusText === 'Unauthorized') {
+        logoutUser()
       }
-    })
-    let data = await response.json()
-    if(response.status === 200) {
-      setBatches(data)
-      console.log(data)
-    } else if (response.statusText === 'Unauthorized') {
-      logoutUser()
+    } else {
+      let response = await fetch('http://127.0.0.1:8000/api/batches/', {
+        method: 'GET',
+        headers: {
+          'Content-Type':'application/json',
+          'Authorization':'Bearer ' + String(authTokens.access)
+        }
+      })
+      let data = await response.json()
+      if(response.status === 200) {
+        setBatches(data)
+        console.log(data)
+      } else if (response.statusText === 'Unauthorized') {
+        logoutUser()
+      }
     }
   }
 
