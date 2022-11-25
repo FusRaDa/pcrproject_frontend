@@ -1,7 +1,6 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import PrivateRoute from './utils/PrivateRoute'
-import LoginPage from './pages/LoginPage'
 import Header from './components/Header'
 import React from 'react';
 
@@ -9,12 +8,14 @@ import ListAssay from './assays/ListAssay';
 import CreateAssay from './assays/CreateAssay';
 import EditAssay from './assays/EditAssay';
 import ListBatch from './batches/ListBatch';
+import WelcomePage from './pages/WelcomePage';
 
 import { AuthProvider } from './context/AuthContext';
 import { provider, ProviderComposer } from './compose';
 import { BatchProvider } from './context/BatchContext';
 import { AssayProvider } from './context/AssayContext';
 import { ReagentProvider } from './context/ReagentContext';
+
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
               <Route element={<EditAssay/>} path="/assay/edit/:pk" exact/>
 
             </Route>
-            <Route element={<LoginPage/>} path="/login" />
+            <Route element={<WelcomePage/>} path="/login" />
           </Routes>
         </ProviderComposer>        
       </Router>

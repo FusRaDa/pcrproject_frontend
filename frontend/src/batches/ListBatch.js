@@ -117,7 +117,7 @@ const ListBatch = () => {
   }
 
   return (
-    <Container fluid>
+    <Container fluid style={{marginTop: '10px'}}>
       <Row>
         <Col>
           <OverlayTrigger placement='right'

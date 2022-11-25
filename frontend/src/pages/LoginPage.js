@@ -1,17 +1,42 @@
 import React, { useContext }from 'react'
 import AuthContext from '../context/AuthContext'
 
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+import Container from "react-bootstrap/Container"
+
+
 const LoginPage = () => {
   let {loginUser} = useContext(AuthContext)
 
   return (
-    <div>
-      <form onSubmit={loginUser}>
-        <input type="text" name="username" placeholder="Enter Username"/>
-        <input type="password" name="password" placeholder="Enter Password"/>
-        <input type="submit"/>
-      </form>
-    </div>
+    <Container fluid>
+  
+    <Form onSubmit={loginUser}>
+      <Row>
+
+        <Col sx='auto'>
+          <Form.Group>
+            <Form.Control name='username' type='text' placeholder='Enter username' />
+          </Form.Group>
+        </Col>
+
+        <Col sx='auto'>
+          <Form.Group>
+            <Form.Control name='password' type='password' placeholder='Enter password' />
+          </Form.Group>
+        </Col>
+
+        <Col sx='auto'>
+          <Button variant='primary' type='submit'>Login</Button>
+        </Col>
+
+      </Row>
+    </Form>
+  
+    </Container>
   )
 }
 

@@ -1,34 +1,43 @@
 import React, {useContext} from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import AuthContext from '../context/AuthContext'
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row'
-import Container from "react-bootstrap/Container";
+import Container from "react-bootstrap/Container"
+import Nav from 'react-bootstrap/Nav'
+import Navbar from 'react-bootstrap/Navbar'
+import LoginPage from '../pages/LoginPage'
 
 const Header = () => {
   let {user, logoutUser} = useContext(AuthContext)
 
+  const navigate = useNavigate()
+
   return (
-    <Container fluid>
-      <Row>
+    <Navbar bg="light" expand="lg" >
+      <Container fluid>
+       
+        <Navbar.Brand href='#home'>PCR Project by Matthew Rada</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+           
+              {user ? (
+                <Nav>
+                  <Nav.Link onClick={() => navigate('/')}>Home</Nav.Link>
+                  <Nav.Link onClick={() => navigate('/assay')}>Assays</Nav.Link>
+                  <Nav.Link onClick={logoutUser}>Logout</Nav.Link>
+                </Nav>
+         
+              ): (
+                <Nav>
+                  <LoginPage/>
+                </Nav>
+              )}
 
-        {user ? (
-          <Col>
-            <p onClick={logoutUser}>Logout</p>
-            <Link to="/">Home</Link>
-            <span> | </span>
-            <Link to="/assay">Assays</Link>
-          </Col>
+          </Navbar.Collapse>
 
-        ): (
-          <Link to="/login">Login</Link>
-        )}
-    
-        {user && <p>Hello {user.username}</p>}
-
-      </Row>
-     
-    </Container>
+          {user && <Navbar.Text>{`Logged in as: ${user.username}`}</Navbar.Text>}
+        
+      </Container>
+    </Navbar>
   )
 }
 
