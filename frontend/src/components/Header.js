@@ -1,10 +1,15 @@
 import React, {useContext} from 'react'
 import { useNavigate } from 'react-router-dom'
+
+//components
 import AuthContext from '../context/AuthContext'
+import LoginPage from '../pages/LoginPage'
+
+//style
 import Container from "react-bootstrap/Container"
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
-import LoginPage from '../pages/LoginPage'
+
 
 const Header = () => {
   let {user, logoutUser} = useContext(AuthContext)

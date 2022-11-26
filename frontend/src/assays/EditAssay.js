@@ -2,6 +2,12 @@ import React, { useContext, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 
+//components
+import AuthContext from "../context/AuthContext"
+import AssayContext from "../context/AssayContext"
+import ReagentContext from "../context/ReagentContext"
+
+//style
 import Container from "react-bootstrap/Container"
 import Row from "react-bootstrap/esm/Row"
 import Col from 'react-bootstrap/Col'
@@ -10,9 +16,7 @@ import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 
-import AuthContext from "../context/AuthContext"
-import AssayContext from "../context/AssayContext"
-import ReagentContext from "../context/ReagentContext"
+
 
 
 const EditAssay = () => {

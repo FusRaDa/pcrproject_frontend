@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
+
+//components
 import BatchTable from '../components/BatchTable';
 import BatchContext from '../context/BatchContext';
 import NumberRangeColumnFilter from '../components/NumberRangeColumnFilter';
@@ -6,7 +8,7 @@ import SelectColumnFilter from '../components/SelectColumnFilter';
 import CreateBatch from './CreateBatch';
 import BatchLabels from './BatchLabels';
 
-//react-bootstrap
+//style
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';

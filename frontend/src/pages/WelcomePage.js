@@ -1,10 +1,13 @@
 import React from "react"
+import { Link } from "react-router-dom"
+
+//style
 import Container from "react-bootstrap/Container"
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
-import { Link } from "react-router-dom"
+
 
 const WelcomePage = () => {
   return(
@@ -12,21 +15,21 @@ const WelcomePage = () => {
       <Row>
 
         <Col>
-          <Card>
+          <Card border="warning" style={{ width: '18rem' }}>
             <Card.Header>Frontend Features</Card.Header>
             <ListGroup>
               <ListGroup.Item><Link to="https://github.com/FusRaDa/pcrproject_frontend">Frontend Code</Link></ListGroup.Item>
               <ListGroup.Item>React.js</ListGroup.Item>
-              <ListGroup.Item>Styling Powered by React-Bootstrap</ListGroup.Item>
-              <ListGroup.Item>Dynamic and Interactive Table powered by React-Table</ListGroup.Item>
-              <ListGroup.Item>Local Storage for Saving Preferences</ListGroup.Item>
+              <ListGroup.Item>Styling with React-Bootstrap</ListGroup.Item>
+              <ListGroup.Item>Dynamic and Interactive Table with React-Table</ListGroup.Item>
+              <ListGroup.Item>Local Storage for Saving User Preferences</ListGroup.Item>
               <ListGroup.Item>Form Validation for User Experience</ListGroup.Item>
             </ListGroup>
           </Card>
         </Col>
 
         <Col>
-          <Card>
+          <Card border="info" style={{ width: '18rem' }}>
             <Card.Header>Backend Features</Card.Header>
             <ListGroup>
               <ListGroup.Item>Django Rest Framework</ListGroup.Item>

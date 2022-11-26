@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTable, useFilters, usePagination, useColumnOrder, useExpanded } from 'react-table'
+
+//components
 import DefaultColumnFilter from './DefaultColumnFilter'
 import FuzzyTextFilterFn from './FuzzyTextFilterFn'
-import styled from 'styled-components'
 import EditableCell from '../components/EditableCell'
 import DynamicCell from './DynamicCell'
+
+//style
+import styled from 'styled-components'
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
 

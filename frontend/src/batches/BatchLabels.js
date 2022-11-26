@@ -1,9 +1,13 @@
 import React, { useContext } from "react"
+
+//components
 import AuthContext from "../context/AuthContext"
-import Row from 'react-bootstrap/Row'
 import BatchContext from "../context/BatchContext"
+
+//style
 import Col from 'react-bootstrap/Col';
 import Container from "react-bootstrap/Container";
+import Row from 'react-bootstrap/Row'
 
 const BatchLabels = () => {
   let {authTokens} = useContext(AuthContext)

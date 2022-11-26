@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+
+//components
+import AuthContext from "../context/AuthContext"
+import AssayContext from "../context/AssayContext"
+import ReagentContext from "../context/ReagentContext"
+
+//style
 import Container from "react-bootstrap/esm/Container"
 import Row from "react-bootstrap/Row"
 import Col from 'react-bootstrap/Col'
@@ -8,9 +15,6 @@ import Button from "react-bootstrap/Button"
 import ListGroup from 'react-bootstrap/ListGroup'
 import Card from 'react-bootstrap/Card'
 
-import AuthContext from "../context/AuthContext"
-import AssayContext from "../context/AssayContext"
-import ReagentContext from "../context/ReagentContext"
 
 const CreateAssay = () => {
   let {authTokens} = useContext(AuthContext)
