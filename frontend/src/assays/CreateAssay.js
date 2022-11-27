@@ -176,11 +176,20 @@ const CreateAssay = () => {
   }
 
   return (
-    <Container fluid="md">
-      <Button onClick={() => handleSwitch()}>{individual ? "Create Group Assay" : "Create Individual Assay"}</Button>
-      
-      <Card>
-        <Card.Header style={{backgroundColor: 'red', textAlign: 'center'}}>{individual ? "Creating an Individual Assay..." : "Creating a Grouped Assay..."}</Card.Header>
+    <Container fluid>
+
+      <Row style={{marginTop: '5px'}}>
+        <Col>
+          <Button onClick={() => handleSwitch()}>{individual ? "Create Group Assay" : "Create Individual Assay"}</Button>
+        </Col>
+
+        <Col style={{display: 'flex', justifyContent: 'right'}}>
+          <Button variant='warning' style={{position: 'fixed'}}>Guide</Button>
+        </Col>
+      </Row>
+   
+      <Card style={{marginTop: '5px'}}>
+        <Card.Header style={{backgroundColor: 'yellow', textAlign: 'center'}}>{individual ? "Creating an Individual Assay..." : "Creating a Grouped Assay..."}</Card.Header>
         <Card.Body>
           <Row>
             <Col>

@@ -131,19 +131,38 @@ const ListBatch = () => {
         </Offcanvas.Header>
         <Offcanvas.Body>
 
-          <h5>Step: 1</h5>
+          <p>This project serves as a way to track PCR information for diagnostic laboratories. Follow these steps to learn how to use my application!</p>
+
+          <h5>Step: 1 - Create a Batch</h5>
           <ol>
-            <li>Coffee</li>
-            <li>Tea</li>
-            <li>Milk</li>
+            <li>Select an assay from the list on the right.</li>
+            <li>Enter number of samples being processed.</li>
+            <li>Create a unique three letter code for the extraction group.</li>
+            <li>Add additional information to relevant fields.</li>
           </ol> 
 
-          <h5>Step: 1</h5>
+          <h5>Step: 2 - Update Batch Information</h5>
           <ol>
-            <li>Coffee</li>
-            <li>Tea</li>
-            <li>Milk</li>
+            <li>Double click on a cell and enter new data.</li>
+            <li>Press enter to save changes.</li>
+            <li>Cells under batch date, assay, and code cannot be modified. As well as cells that are empty under the extraction group columns.</li>
           </ol> 
+
+          <h5>Step: 3 - Edit Dynamic Columns</h5>
+          <ol>
+            <li>You can also move columns by pressing the left or right arrow buttons at the top of the columns.</li>
+            <li>Press button labeled: Add/Edit Label Columns</li>
+            <li>To update a column, click edit, change column name, and press update.</li>
+            <li>Press delete to remove columns from table.</li>
+            <li>You may also add a new column by typing a name and clicking add.</li>
+          </ol> 
+
+          <h5>Step: 4 - Access Assays</h5>
+          <ol>
+            <li>You may also create your own assays by clicking on Assays tab at the top of the page.</li>
+          </ol> 
+
+        
         
         </Offcanvas.Body>
       </Offcanvas>

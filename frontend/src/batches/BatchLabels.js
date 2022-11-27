@@ -154,7 +154,7 @@ const BatchLabels = () => {
       <Row>
         <form onSubmit={addLabel}>
           <input type="text" required id="add_label" name="label" placeholder="Enter New Column"/>
-          <input type="submit"/>
+          <input type="submit" value="Add"/>
         </form>
       </Row>
     </Container>

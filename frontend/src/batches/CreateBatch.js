@@ -233,10 +233,10 @@ const CreateBatch = () => {
   }
 
   return (
-    <Container fluid="md">
+    <Container fluid>
       <Row>
         <Col>
-          <Container>
+          <Container fluid>
             <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}} noValidate>
               <Form.Group>
                 <Form.Label>Assay</Form.Label>
@@ -298,7 +298,7 @@ const CreateBatch = () => {
           </Col>
 
           <Col>
-            <Container>
+            <Container fluid>
             <Button onClick={() => setGroupList(!groupList)}>{groupList ? "View Individual Assays" : "View Group Assays"}</Button>
             <Form className="d-flex" onChange={() => searchAssay()}>
               <Form.Control
