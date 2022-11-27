@@ -23,8 +23,6 @@ const ListBatch = () => {
   let [rowClicked, setRowClicked] = useState(null)
   let [columns, setColumns] = useState([])
 
-
-
   //pagination
   let [data, setData] = useState([])
   let [loading, setLoading] = useState(false)
@@ -127,13 +125,26 @@ const ListBatch = () => {
         </Col>
       </Row>
 
-      <Offcanvas show={guide} onHide={handleClose}>
+      <Offcanvas placement='end' show={guide} onHide={handleClose} backdrop={false} scroll={true}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+          <Offcanvas.Title>Step-by-step Guide</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          Some text as placeholder. In real life you can have the elements you
-          have chosen. Like, text, images, lists, etc.
+
+          <h5>Step: 1</h5>
+          <ol>
+            <li>Coffee</li>
+            <li>Tea</li>
+            <li>Milk</li>
+          </ol> 
+
+          <h5>Step: 1</h5>
+          <ol>
+            <li>Coffee</li>
+            <li>Tea</li>
+            <li>Milk</li>
+          </ol> 
+        
         </Offcanvas.Body>
       </Offcanvas>
 

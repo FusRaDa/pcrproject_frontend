@@ -1,10 +1,8 @@
 import React from "react"
-import { Link } from "react-router-dom"
 
 //style
 import Container from "react-bootstrap/Container"
 import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
 
@@ -12,13 +10,13 @@ import ListGroup from 'react-bootstrap/ListGroup'
 const WelcomePage = () => {
   return(
     <Container>
-      <Row>
+      <Row style={{display: 'flex', justifyContent: 'center', marginTop: '50px'}}>
 
-        <Col>
-          <Card border="warning" style={{ width: '18rem' }}>
+    
+          <Card bg='warning' border="warning" style={{ width: '25rem', marginRight: '100px' }}>
             <Card.Header>Frontend Features</Card.Header>
-            <ListGroup>
-              <ListGroup.Item><Link to="https://github.com/FusRaDa/pcrproject_frontend">Frontend Code</Link></ListGroup.Item>
+            <ListGroup style={{marginBottom: '20px'}}>
+              <ListGroup.Item><a href="https://github.com/FusRaDa/pcrproject_frontend" target="_blank" rel="noopener noreferrer">Frontend Code</a></ListGroup.Item>
               <ListGroup.Item>React.js</ListGroup.Item>
               <ListGroup.Item>Styling with React-Bootstrap</ListGroup.Item>
               <ListGroup.Item>Dynamic and Interactive Table with React-Table</ListGroup.Item>
@@ -26,14 +24,12 @@ const WelcomePage = () => {
               <ListGroup.Item>Form Validation for User Experience</ListGroup.Item>
             </ListGroup>
           </Card>
-        </Col>
-
-        <Col>
-          <Card border="info" style={{ width: '18rem' }}>
+     
+          <Card bg='primary' border="info" style={{ width: '25rem' }}>
             <Card.Header>Backend Features</Card.Header>
-            <ListGroup>
+            <ListGroup style={{marginBottom: '20px'}}>
+              <ListGroup.Item><a href="https://github.com/FusRaDa/pcrproject_backend" target="_blank" rel="noopener noreferrer">Backend Code</a></ListGroup.Item>
               <ListGroup.Item>Django Rest Framework</ListGroup.Item>
-              <ListGroup.Item><Link to="https://github.com/FusRaDa/pcrproject_backend">Backend Code</Link></ListGroup.Item>
               <ListGroup.Item>JSON Web Tokens Authentication</ListGroup.Item>
               <ListGroup.Item>CRUD Operations</ListGroup.Item>
               <ListGroup.Item>ForeignKey and ManytoMany Table Relations</ListGroup.Item>
@@ -41,7 +37,7 @@ const WelcomePage = () => {
               <ListGroup.Item>Validation of Information and Security</ListGroup.Item>
             </ListGroup>
           </Card>
-        </Col>
+      
 
       </Row>
     </Container>
