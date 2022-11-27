@@ -14,14 +14,16 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/esm/Button';
 import Modal from 'react-bootstrap/Modal';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+
 
 const ListBatch = () => {
   let {setPageNum, setUpdating, batches, labels} = useContext(BatchContext)
 
   let [rowClicked, setRowClicked] = useState(null)
   let [columns, setColumns] = useState([])
+
+
 
   //pagination
   let [data, setData] = useState([])
@@ -31,7 +33,10 @@ const ListBatch = () => {
 
   let [isEdit, setIsEdit] = useState(false)
 
+  //modal and offcanvas
   let [show, setShow] = useState(false)
+  let [guide, setGuide] = useState(true)
+
 
   let changePage = (pageIndex) => {
     setPageNum(pageIndex)
@@ -105,74 +110,68 @@ const ListBatch = () => {
     return newColumn
   }
 
-  let popover = (title, info) => {
-    return (
-      <Popover>
-        <Popover.Header style={{backgroundColor: 'red'}}>
-          {title}
-        </Popover.Header>
-        <Popover.Body>
-          {info}
-        </Popover.Body>
-      </Popover>
-    )
-  }
+  const handleClose = () => setGuide(false);
+  const handleShow = () => setGuide(true);
+
 
   return (
-    <Container fluid style={{marginTop: '10px'}}>
+    <Container fluid style={{marginTop: '5px'}}>
       <Row>
         <Col>
-          <OverlayTrigger placement='right'
-            overlay={popover("Dynamic Table", "Part of this table can be modified. Columns such as assay and # of samples are mandatory fields and therefore cannot be edited.")}>
-            <Button onClick={() => setShow(true)}>Add/Edit Label Columns</Button>
-          </OverlayTrigger>
+          <Button onClick={() => setShow(true)}>Add/Edit Label Columns</Button>
+        </Col>
+        <Col style={{display: 'flex', justifyContent: 'right'}}>
+          <Button variant='warning' style={{position: 'fixed'}} onClick={handleShow}>
+            Guide
+          </Button>
         </Col>
       </Row>
 
-      <Row>
-        <OverlayTrigger placement='bottom'
-          overlay={popover(
-            "React-Table Guide", 
-            "For existing rows, double click on a cell to edit information and press enter to update. " +  
-            "You may rearrange columns by pressing left/right. You can also use the search tool (S).")}>
-          <Col>
-            <BatchTable 
-              columns={columns} 
-              data={data} 
-              rowClicked={rowClicked}
-              setRowClicked={setRowClicked}
-              fetchData={fetchData}
-              loading={loading}
-              pageCount={pageCount}
-              isEdit={isEdit}
-              setIsEdit={setIsEdit}
-              changePage={changePage}
-            />
-          </Col>
-        </OverlayTrigger>
+      <Offcanvas show={guide} onHide={handleClose}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          Some text as placeholder. In real life you can have the elements you
+          have chosen. Like, text, images, lists, etc.
+        </Offcanvas.Body>
+      </Offcanvas>
+
+      <Row style={{marginTop: '5px'}}>
+        <Col>
+          <BatchTable 
+            columns={columns} 
+            data={data} 
+            rowClicked={rowClicked}
+            setRowClicked={setRowClicked}
+            fetchData={fetchData}
+            loading={loading}
+            pageCount={pageCount}
+            isEdit={isEdit}
+            setIsEdit={setIsEdit}
+            changePage={changePage}
+          />
+        </Col>
       </Row>
 
-      <OverlayTrigger placement='top' overlay={popover("Create New Batch", "Select an assay from a list to include in the batch. To edit/add assays click on assays on top of page.")}>
-        <Row style={{marginTop: '50px'}}>
-          <CreateBatch/>
-        </Row>
-      </OverlayTrigger>
-
+      <Row style={{marginTop: '50px'}}>
+        <CreateBatch/>
+      </Row>
+   
       <Modal show={show} onHide={() => setShow(false)} dialogClassName="batch-modal" centered>
+
         <Modal.Header closeButton>
           <Modal.Title>
             Additional Label Columns
           </Modal.Title>
         </Modal.Header>
-        <OverlayTrigger placement='bottom' overlay={popover("Manage Columns", "You may add more columns and delete columns." + 
-          " Be aware that changing column names will not show data if there is no previous data pointing to the exact name of column")}>
-          <Modal.Body>
-            <BatchLabels/>
-          </Modal.Body>
-        </OverlayTrigger>
+
+        <Modal.Body>
+          <BatchLabels/>
+        </Modal.Body>
+    
       </Modal>
 
-   
     </Container>
   )
 }

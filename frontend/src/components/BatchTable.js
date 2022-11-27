@@ -220,7 +220,7 @@ const BatchTable = ({columns, data, rowClicked, setRowClicked, fetchData, loadin
                   <tr>
                     <td colSpan={visibleColumns.length}>
                       <Row>
-                      <Button variant='danger'>Delete</Button>
+                      <Button variant='danger' disabled>Delete - currently disabled</Button>
                       </Row>
                     </td>
                   </tr>
