@@ -12,6 +12,7 @@ import Container from "react-bootstrap/esm/Container"
 import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/esm/Button'
 import Card from 'react-bootstrap/Card';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 const ListAssay = () => {
 
@@ -23,12 +24,17 @@ const ListAssay = () => {
   let [search, setSearch] = useState("")
   let [assay, setAssay] = useState(null)
 
+  let [guide, setGuide] = useState(true)
+
   const navigate = useNavigate()
 
   let searchAssay = () => {
     let data = document.getElementById('search').value
     setSearch(data.toLowerCase())
   }
+
+  const handleClose = () => setGuide(false);
+  const handleShow = () => setGuide(true);
 
 
   return (
@@ -39,9 +45,43 @@ const ListAssay = () => {
           <Button onClick={() => navigate('/assay/create')}>Create Individual Assay</Button>
         </Col>
         <Col style={{display: 'flex', justifyContent: 'right'}}>
-          <Button variant='warning' style={{position: 'fixed'}}>Guide</Button>
+          <Button variant='warning' style={{position: 'fixed'}} onClick={handleShow}>
+            Guide
+          </Button>
         </Col>
       </Row>
+
+      <Offcanvas placement='end' show={guide} onHide={handleClose} backdrop={false} scroll={true}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Step-by-step Guide - List of Assays</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+
+          <p>This page displays a list of assays and allows you to create or edit an assay.</p>
+
+          <h5>Step: 1 - View Assay Details</h5>
+          <ol>
+            <li>Assays are catagorized as either an individual or group assay.</li>
+            <li>Click on the button labeled View Group Assays to view group assays.</li>
+            <li>Click on an assay to view its details.</li>
+          </ol>
+
+          <h5>Step: 2 - Edit an Assay</h5>
+          <ol>
+            <li>After selecting an assay, press Edit Assay to edit the selected assay.</li>
+          </ol>
+
+          <h5>Step: 3 - Create an Assay</h5>
+          <ol>
+            <li>Click on the button labeled Create Individual Assay.</li>
+          </ol>
+
+
+
+      
+        
+        </Offcanvas.Body>
+      </Offcanvas>
 
       <Row style={{marginTop: '5px'}}>
         <Col>
@@ -127,7 +167,7 @@ const ListAssay = () => {
                 </ListGroup>} */}
                 
             </ListGroup>
-            <Button onClick={() => navigate(`/assay/edit/${assay.pk}`, {state: {assay:assay}})}>Edit this Assay</Button>
+            <Button onClick={() => navigate(`/assay/edit/${assay.pk}`, {state: {assay:assay}})}>Edit Assay</Button>
           </Card>}
 
           {assay === null && 

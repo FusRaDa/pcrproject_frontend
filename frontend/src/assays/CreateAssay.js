@@ -14,6 +14,7 @@ import Form from 'react-bootstrap/Form'
 import Button from "react-bootstrap/Button"
 import ListGroup from 'react-bootstrap/ListGroup'
 import Card from 'react-bootstrap/Card'
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 
 const CreateAssay = () => {
@@ -25,6 +26,8 @@ const CreateAssay = () => {
 
   let [individual, setIndividual] = useState(true)
   let [search, setSearch] = useState("")
+
+  let [guide, setGuide] = useState(true)
 
   let [addedAssays, setAddedAssays] = useState([])
   let [addedReagents, setAddedReagents] = useState([])
@@ -175,21 +178,60 @@ const CreateAssay = () => {
     setSearch("")
   }
 
+  const handleClose = () => setGuide(false);
+  const handleShow = () => setGuide(true);
+
   return (
     <Container fluid>
 
       <Row style={{marginTop: '5px'}}>
         <Col>
+          <Button variant="danger" onClick={() => navigate('/assay')}>Cancel</Button>
           <Button onClick={() => handleSwitch()}>{individual ? "Create Group Assay" : "Create Individual Assay"}</Button>
         </Col>
 
         <Col style={{display: 'flex', justifyContent: 'right'}}>
-          <Button variant='warning' style={{position: 'fixed'}}>Guide</Button>
+          <Button variant='warning' style={{position: 'fixed'}} onClick={handleShow}>
+            Guide
+          </Button>
         </Col>
       </Row>
+
+      <Offcanvas placement='end' show={guide} onHide={handleClose} backdrop={false} scroll={true}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Step-by-step Guide - Create an Assay</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+
+          <p>This page allows you to create an assay.</p>
+
+          <h5>Step: 1 - Create an Individual Assay</h5>
+          <ol>
+            <li>Individual assays only contain a list of reagents.</li>
+            <li>Enter assay name, code, and type. Assay name and code must be unique for all assays.</li>
+            <li>Select reagents to add from the reagents list on the right.</li>
+            <li>Remove selected reagents by clicking on the added reagents list on the left.</li>
+          </ol> 
+
+          <h5>Step: 2 - Create a Group Assay</h5>
+          <ol>
+            <li>Group assays only contain a list of individual assays.</li>
+            <li>Enter assay name and code. Assay name and code must be unique for all assays.</li>
+            <li>Select individual assays to add from the assay list on the right.</li>
+            <li>Remove selected individual assay by clicking on the added assays list on the left.</li>
+          </ol> 
+
+          <h5>Step: 3 - Add Assay</h5>
+          <ol>
+            <li>Click Add Assay after adding at least one reagent for an individual assay.</li>
+            <li>Click Add Assay after adding at least two indiviudal assays for a group assay.</li>
+          </ol> 
+
+        </Offcanvas.Body>
+      </Offcanvas>
    
       <Card style={{marginTop: '5px'}}>
-        <Card.Header style={{backgroundColor: 'yellow', textAlign: 'center'}}>{individual ? "Creating an Individual Assay..." : "Creating a Grouped Assay..."}</Card.Header>
+        <Card.Header style={{backgroundColor: '#0D6EFD', textAlign: 'center', color: '#FFFFFF'}}>{individual ? "Creating an Individual Assay..." : "Creating a Grouped Assay..."}</Card.Header>
         <Card.Body>
           <Row>
             <Col>
@@ -248,7 +290,7 @@ const CreateAssay = () => {
                   </Form.Group>
 
                   <Card bg='primary' text='light' style={{marginTop: '10px'}}>
-                    <Card.Header>Grouped Assays</Card.Header>
+                    <Card.Header>Added Assays</Card.Header>
                     <ListGroup>
                       {addedAssays.map(assay => (
                         <ListGroup.Item variant="secondary" action key={assay.pk} onClick={() => removeAssayFromGroup(assay)}>

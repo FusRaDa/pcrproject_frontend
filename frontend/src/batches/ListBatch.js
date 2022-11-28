@@ -127,7 +127,7 @@ const ListBatch = () => {
 
       <Offcanvas placement='end' show={guide} onHide={handleClose} backdrop={false} scroll={true}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Step-by-step Guide</Offcanvas.Title>
+          <Offcanvas.Title>Step-by-step Guide - Batches</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
 
@@ -150,7 +150,7 @@ const ListBatch = () => {
 
           <h5>Step: 3 - Edit Dynamic Columns</h5>
           <ol>
-            <li>You can also move columns by pressing the left or right arrow buttons at the top of the columns.</li>
+            <li>You can also move columns by pressing the left or right arrow buttons at the top of each column.</li>
             <li>Press button labeled: Add/Edit Label Columns</li>
             <li>To update a column, click edit, change column name, and press update.</li>
             <li>Press delete to remove columns from table.</li>
@@ -159,7 +159,7 @@ const ListBatch = () => {
 
           <h5>Step: 4 - Access Assays</h5>
           <ol>
-            <li>You may also create your own assays by clicking on Assays tab at the top of the page.</li>
+            <li>You may also create your own assays by clicking on the Assays tab at the top of the page.</li>
           </ol> 
 
         
