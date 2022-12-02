@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import AuthContext from "../context/AuthContext"
 import AssayContext from "../context/AssayContext"
 import ReagentContext from "../context/ReagentContext"
+import ServerAddress from "../ServerAddress"
 
 //style
 import Container from "react-bootstrap/Container"
@@ -15,7 +16,8 @@ import Button from "react-bootstrap/Button"
 import Form from 'react-bootstrap/Form'
 import Card from 'react-bootstrap/Card'
 import ListGroup from 'react-bootstrap/ListGroup'
-import Offcanvas from 'react-bootstrap/Offcanvas';
+import Offcanvas from 'react-bootstrap/Offcanvas'
+
 
 
 const EditAssay = () => {
@@ -101,7 +103,7 @@ const EditAssay = () => {
       }
     }
 
-    let response = await fetch(`http://127.0.0.1:8000/api/assays/${location.state.assay.pk}/update/`, {
+    let response = await fetch(`${ServerAddress}/api/assays/${location.state.assay.pk}/update/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +136,7 @@ const EditAssay = () => {
   } 
 
   let deleteAssay = async () => {
-    let response = await fetch(`http://127.0.0.1:8000/api/assays/${location.state.assay.pk}/destroy/`, {
+    let response = await fetch(`${ServerAddress}/api/assays/${location.state.assay.pk}/destroy/`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -173,7 +175,7 @@ const EditAssay = () => {
 
   const handleClose = () => setGuide(false);
   const handleShow = () => setGuide(true);
-
+  
 
   return (
     <Container fluid>
@@ -220,7 +222,7 @@ const EditAssay = () => {
 
           <h5>Step: 5 - Delete Assay</h5>
           <ol>
-            <li>Click the red delete button to delete assay.</li>   
+            <li>Click the red delete button to delete assay. Test_user has no permission to delete.</li>   
           </ol> 
         
         </Offcanvas.Body>

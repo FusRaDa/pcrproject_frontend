@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import ServerAddress from '../ServerAddress'
 import AuthContext from './AuthContext'
 
 const AssayContext = createContext()
@@ -12,7 +13,7 @@ export const AssayProvider = ({children}) => {
   let [updating, setUpdating] = useState(false)
 
   let getAssays = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/assays/', {
+    let response = await fetch(`${ServerAddress}/api/assays/`, {
       method: 'GET', 
       headers: {
         'Content-Type':'application/json',

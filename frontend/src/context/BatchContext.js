@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import ServerAddress from '../ServerAddress'
 import AuthContext from './AuthContext'
 
 const BatchContext = createContext()
@@ -18,7 +19,7 @@ export const BatchProvider = ({children}) => {
   let getBatches = async () => {
 
     if (pageNum !== null) {
-      let response = await fetch(`http://127.0.0.1:8000/api/batches/?page=${+pageNum + 1}`, {
+      let response = await fetch(`${ServerAddress}/api/batches/?page=${+pageNum + 1}`, {
         method: 'GET',
         headers: {
           'Content-Type':'application/json',
@@ -33,7 +34,7 @@ export const BatchProvider = ({children}) => {
         logoutUser()
       }
     } else {
-      let response = await fetch('http://127.0.0.1:8000/api/batches/', {
+      let response = await fetch(`${ServerAddress}/api/batches/`, {
         method: 'GET',
         headers: {
           'Content-Type':'application/json',
@@ -51,7 +52,7 @@ export const BatchProvider = ({children}) => {
   }
 
   let getLabels = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/labels/', {
+    let response = await fetch(`${ServerAddress}/api/labels/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

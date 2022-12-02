@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react"
 import AuthContext from "../context/AuthContext"
 import AssayContext from "../context/AssayContext"
 import BatchContext from "../context/BatchContext"
+import ServerAddress from "../ServerAddress"
 
 //style
 import Col from 'react-bootstrap/Col'
@@ -102,7 +103,7 @@ const CreateBatch = () => {
 
     let labelData = batchData(e)
   
-    let response = await fetch('http://127.0.0.1:8000/api/batches/create/', {
+    let response = await fetch(`${ServerAddress}/api/batches/create/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

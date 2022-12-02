@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import AuthContext from '../context/AuthContext'
 import BatchContext from '../context/BatchContext'
+import ServerAddress from '../ServerAddress'
 
 const EditableCell = ({ cell, value: initialValue, setIsEdit}) => {
   let {authTokens} = useContext(AuthContext)
@@ -27,7 +28,7 @@ const EditableCell = ({ cell, value: initialValue, setIsEdit}) => {
       data['assay'] = batch.assay
     }
 
-    let response = await fetch(`http://127.0.0.1:8000/api/batches/${batch.pk}/update/`, {
+    let response = await fetch(`${ServerAddress}/api/batches/${batch.pk}/update/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

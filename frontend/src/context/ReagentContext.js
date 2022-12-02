@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import ServerAddress from '../ServerAddress'
 import AuthContext from './AuthContext'
 
 const ReagentContext = createContext()
@@ -12,7 +13,7 @@ export const ReagentProvider = ({children}) => {
   let [updating, setUpdating] = useState(false)
 
   let getReagents = async () => {
-    let response = await fetch('http://127.0.0.1:8000/api/reagents/', {
+    let response = await fetch(`${ServerAddress}/api/reagents/`, {
       method: 'GET',
       headers: {
         'Content-Type':'application/json',

@@ -76,10 +76,6 @@ const ListAssay = () => {
             <li>Click on the button labeled Create Individual Assay.</li>
           </ol>
 
-
-
-      
-        
         </Offcanvas.Body>
       </Offcanvas>
 

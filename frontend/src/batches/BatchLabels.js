@@ -3,11 +3,13 @@ import React, { useContext } from "react"
 //components
 import AuthContext from "../context/AuthContext"
 import BatchContext from "../context/BatchContext"
+import ServerAddress from "../ServerAddress";
 
 //style
 import Col from 'react-bootstrap/Col';
 import Container from "react-bootstrap/Container";
 import Row from 'react-bootstrap/Row'
+
 
 const BatchLabels = () => {
   let {authTokens} = useContext(AuthContext)
@@ -17,7 +19,7 @@ const BatchLabels = () => {
     e.preventDefault()
     let edit = notUpdating()
     if (edit === true) {
-      let response = await fetch('http://127.0.0.1:8000/api/labels/create/', {
+      let response = await fetch(`${ServerAddress}/api/labels/create/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +42,7 @@ const BatchLabels = () => {
   let deleteLabel = async (pk) => {
     let edit = notUpdating()
     if (edit === true) {
-      let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/destroy/`, {
+      let response = await fetch(`${ServerAddress}/api/labels/${pk}/destroy/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +65,7 @@ const BatchLabels = () => {
     let update = document.getElementById(pk).value
     let current = document.getElementById(pk).defaultValue
     if (update !== current) {
-      let response = await fetch(`http://127.0.0.1:8000/api/labels/${pk}/update/`, {
+      let response = await fetch(`${ServerAddress}/api/labels/${pk}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +87,7 @@ const BatchLabels = () => {
     e.preventDefault()
     let update = e.target.field.value
     if (update !== e.target.field.defaultValue) {
-      let response = await fetch(`http://127.0.0.1:8000/api/labels/${e.target.field.id}/update/`, {
+      let response = await fetch(`${ServerAddress}/api/labels/${e.target.field.id}/update/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

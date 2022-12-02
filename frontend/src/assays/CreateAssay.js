@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import AuthContext from "../context/AuthContext"
 import AssayContext from "../context/AssayContext"
 import ReagentContext from "../context/ReagentContext"
+import ServerAddress from "../ServerAddress"
 
 //style
 import Container from "react-bootstrap/esm/Container"
@@ -14,7 +15,7 @@ import Form from 'react-bootstrap/Form'
 import Button from "react-bootstrap/Button"
 import ListGroup from 'react-bootstrap/ListGroup'
 import Card from 'react-bootstrap/Card'
-import Offcanvas from 'react-bootstrap/Offcanvas';
+import Offcanvas from 'react-bootstrap/Offcanvas'
 
 
 const CreateAssay = () => {
@@ -138,7 +139,7 @@ const CreateAssay = () => {
       }
     }
 
-    let response = await fetch('http://127.0.0.1:8000/api/assays/create/', {
+    let response = await fetch(`${ServerAddress}/api/assays/create/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
