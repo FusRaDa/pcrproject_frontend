@@ -8,7 +8,7 @@ export default ReagentContext
 
 export const ReagentProvider = ({children}) => {
 
-  let {authTokens} = useContext(AuthContext)
+  let {authTokens, user} = useContext(AuthContext)
   let [reagents, setReagents] = useState([])
   let [updating, setUpdating] = useState(false)
 
@@ -33,7 +33,7 @@ export const ReagentProvider = ({children}) => {
     setUpdating(false)
     getReagents()
     // eslint-disable-next-line
-  }, [updating])
+  }, [updating, user])
 
   let contextData = {
     getReagents: getReagents,

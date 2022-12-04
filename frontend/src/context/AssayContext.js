@@ -8,7 +8,7 @@ export default AssayContext
 
 export const AssayProvider = ({children}) => {
 
-  let {authTokens} = useContext(AuthContext)
+  let {authTokens, user} = useContext(AuthContext)
   let [assays, setAssays] = useState([])
   let [updating, setUpdating] = useState(false)
 
@@ -33,7 +33,7 @@ export const AssayProvider = ({children}) => {
     setUpdating(false)
     getAssays()
     // eslint-disable-next-line
-  }, [updating])
+  }, [updating, user])
 
   let contextData = {
     getAssays: getAssays,
