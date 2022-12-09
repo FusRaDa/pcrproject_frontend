@@ -24,6 +24,10 @@ export const AuthProvider = ({children}) => {
       },
       body: JSON.stringify({'username':e.target.username.value, 'password':e.target.password.value})
     })
+    .catch(() => {
+      navigate('/error_page')
+    })
+
     let data = await response.json() //token
     if(response.status === 200) {
       setAuthTokens(data)
@@ -31,12 +35,11 @@ export const AuthProvider = ({children}) => {
       localStorage.setItem('authTokens', JSON.stringify(data))
       navigate('/')
     } else {
-      alert('Something went wrong here!')
+      alert('Incorrect Credentials')
     }
   }
 
   let updateToken = async () => {
-    console.log('Update token called');
     let response = await fetch(`${ServerAddress}/api/token/refresh/`, {
       method: 'POST',
       headers: {
@@ -44,18 +47,21 @@ export const AuthProvider = ({children}) => {
       },
       body: JSON.stringify({'refresh':authTokens?.refresh}) //refresh token
     })
-    let data = await response.json() 
+    .catch(() => {
+      logoutUser()
+      navigate('/error_page')
+    })
 
+    let data = await response.json() 
     if (response.status === 200) {
       setAuthTokens(data)
       setUser(jwt_decode(data.access))
       localStorage.setItem('authTokens', JSON.stringify(data))
-    } else {
-      logoutUser()
-    }
-    if (loading) {
-      setLoading(false)
-    }
+
+      if (loading) {
+        setLoading(false)
+      }
+    } 
   }
 
   let logoutUser = () => {
@@ -73,6 +79,7 @@ export const AuthProvider = ({children}) => {
   }
 
   useEffect(() => {
+    console.log('token refresh')
     if (loading) {
       updateToken()
     }
@@ -89,7 +96,7 @@ export const AuthProvider = ({children}) => {
 
   return (
     <AuthContext.Provider value={contextData} >
-      {loading ? null : children}
+      {children}
     </AuthContext.Provider>
   )
 }

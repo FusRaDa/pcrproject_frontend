@@ -8,7 +8,7 @@ export default ReagentContext
 
 export const ReagentProvider = ({children}) => {
 
-  let {authTokens, user} = useContext(AuthContext)
+  let {authTokens, user, logoutUser} = useContext(AuthContext)
   let [reagents, setReagents] = useState([])
   let [updating, setUpdating] = useState(false)
 
@@ -19,6 +19,9 @@ export const ReagentProvider = ({children}) => {
         'Content-Type':'application/json',
         'Authorization':'Bearer ' + String(authTokens.access)
       }
+    })
+    .catch(() => {
+      logoutUser()
     })
     let data = await response.json()
     if (response.status === 200) {
@@ -31,7 +34,9 @@ export const ReagentProvider = ({children}) => {
 
   useEffect(() => {
     setUpdating(false)
-    getReagents()
+    if (user) {
+      getReagents()
+    }
     // eslint-disable-next-line
   }, [updating, user])
 

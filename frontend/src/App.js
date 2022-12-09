@@ -14,6 +14,7 @@ import { provider, ProviderComposer } from './compose';
 import { BatchProvider } from './context/BatchContext';
 import { AssayProvider } from './context/AssayContext';
 import { ReagentProvider } from './context/ReagentContext';
+import ErrorPage from './utils/ErrorPage';
 
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
               <Route element={<EditAssay/>} path="/assay/edit/:pk" exact/>
 
             </Route>
-            <Route element={<WelcomePage/>} path="/login" />
+            <Route element={<WelcomePage/>} path="/login" exact/>
+            <Route element={<ErrorPage/>} path="/error_page" exact/>
           </Routes>
         </ProviderComposer>        
       </Router>

@@ -13,6 +13,7 @@ import Container from 'react-bootstrap/Container'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Button from 'react-bootstrap/Button'
 import Row from 'react-bootstrap/Row'
+import Modal from 'react-bootstrap/Modal';
 
 
 const CreateBatch = () => {
@@ -40,6 +41,9 @@ const CreateBatch = () => {
   let [uniqueErrorDNA, setUniqueErrorDNA] = useState(false)
   let [uniqueErrorRNA, setUniqueErrorRNA] = useState(false)
   let [sameExtGroup, setSameExtGroup] = useState(false)
+
+  //for modal
+  let [show, setShow] = useState(false)
 
   useEffect(() => {
     resetAllValidations()
@@ -237,12 +241,13 @@ const CreateBatch = () => {
     <Container fluid>
       <Row>
         <Col>
-          <Container fluid>
+          <Container>
             <Form onSubmit={addBatch} style={{maxHeight: 'calc(100vh - 210px)', overflowY: 'auto'}} noValidate>
               <Form.Group>
                 <Form.Label>Assay</Form.Label>
                 <Form.Control isInvalid={selectedAssay !== null ? false : assayValidated} id="assay" required placeholder="Select Assay" disabled defaultValue={selectedAssay === null ? "" : `${selectedAssay.code}-${selectedAssay.name}`}/>
-                <Form.Control.Feedback type='invalid'>Select an assay from the list.</Form.Control.Feedback>
+                <Form.Control.Feedback type='invalid'>Select an assay.</Form.Control.Feedback>
+                <Button onClick={() => setShow(true)}>Select an Assay</Button>
               </Form.Group>
               <Form.Group style={{marginTop: '15px'}}>
                 <Form.Label>Number Of Samples</Form.Label>
@@ -298,8 +303,20 @@ const CreateBatch = () => {
             </Container>
           </Col>
 
-          <Col>
-            <Container fluid>
+        
+        
+      </Row>
+
+      <Modal show={show} onHide={() => setShow(false)} dialogClassName="batch-modal" centered>
+
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Assay List
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Container fluid>
             <Button onClick={() => setGroupList(!groupList)}>{groupList ? "View Individual Assays" : "View Group Assays"}</Button>
             <Form className="d-flex" onChange={() => searchAssay()}>
               <Form.Control
@@ -331,9 +348,10 @@ const CreateBatch = () => {
             ))}
             </ListGroup>}
           </Container>
-        </Col>
-        
-      </Row>
+        </Modal.Body>
+    
+      </Modal>
+
     </Container>
   )
 }

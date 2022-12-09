@@ -8,7 +8,7 @@ export default BatchContext
 
 export const BatchProvider = ({children}) => {
 
-  let {authTokens, logoutUser} = useContext(AuthContext)
+  let {authTokens, logoutUser, user} = useContext(AuthContext)
   let [batches, setBatches] = useState([])
   let [labels, setLabels] = useState([])
   let [updating, setUpdating] = useState(false)
@@ -26,6 +26,10 @@ export const BatchProvider = ({children}) => {
           'Authorization':'Bearer ' + String(authTokens.access)
         }
       })
+      .catch(() => {
+        logoutUser()
+      })
+
       let data = await response.json()
       if(response.status === 200) {
         setBatches(data)
@@ -41,6 +45,10 @@ export const BatchProvider = ({children}) => {
           'Authorization':'Bearer ' + String(authTokens.access)
         }
       })
+      .catch(() => {
+        logoutUser()
+      })
+      
       let data = await response.json()
       if(response.status === 200) {
         setBatches(data)
@@ -59,6 +67,10 @@ export const BatchProvider = ({children}) => {
         'Authorization':'Bearer ' + String(authTokens.access)
       },
     })
+    .catch(() => {
+      logoutUser()
+    })
+
     let data = await response.json()
     if(response.status === 200) {
       setLabels(data)
@@ -69,8 +81,10 @@ export const BatchProvider = ({children}) => {
 
   useEffect(() => {
     setUpdating(false)
-    getBatches()
-    getLabels()
+    if (user) {
+      getBatches()
+      getLabels()
+    }
     // eslint-disable-next-line 
   }, [updating])
 

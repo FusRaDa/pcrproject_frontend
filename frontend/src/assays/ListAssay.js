@@ -51,7 +51,7 @@ const ListAssay = () => {
         </Col>
       </Row>
 
-      <Offcanvas placement='end' show={guide} onHide={handleClose} backdrop={false} scroll={true}>
+      <Offcanvas placement='end' show={guide} onHide={handleClose} backdrop={true} scroll={true}>
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>Step-by-step Guide - List of Assays</Offcanvas.Title>
         </Offcanvas.Header>

@@ -8,7 +8,7 @@ export default AssayContext
 
 export const AssayProvider = ({children}) => {
 
-  let {authTokens, user} = useContext(AuthContext)
+  let {authTokens, user, logoutUser} = useContext(AuthContext)
   let [assays, setAssays] = useState([])
   let [updating, setUpdating] = useState(false)
 
@@ -20,6 +20,10 @@ export const AssayProvider = ({children}) => {
         'Authorization':'Bearer ' + String(authTokens.access)
       }
     })
+    .catch(() => {
+      logoutUser()
+    })
+
     let data = await response.json()
     if (response.status === 200) {
       setAssays(data)
@@ -31,7 +35,9 @@ export const AssayProvider = ({children}) => {
 
   useEffect(() => {
     setUpdating(false)
-    getAssays()
+    if (user) {
+      getAssays()
+    }
     // eslint-disable-next-line
   }, [updating, user])
 
