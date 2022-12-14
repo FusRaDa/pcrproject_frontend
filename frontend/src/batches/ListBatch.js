@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useRef, useState, useCallback } from 'rea
 //components
 import BatchTable from '../components/BatchTable';
 import BatchContext from '../context/BatchContext';
+import AssayContext from '../context/AssayContext';
+import ReagentContext from '../context/ReagentContext';
 import NumberRangeColumnFilter from '../components/NumberRangeColumnFilter';
 import SelectColumnFilter from '../components/SelectColumnFilter';
 import CreateBatch from './CreateBatch';
@@ -20,6 +22,9 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 const ListBatch = () => {
   let {setPageNum, setUpdating, batches, labels} = useContext(BatchContext)
 
+  let {setInitializeAssays} = useContext(AssayContext)
+  let {setInitializeReagents} = useContext(ReagentContext)
+
   let [rowClicked, setRowClicked] = useState(null)
   let [columns, setColumns] = useState([])
 
@@ -34,6 +39,12 @@ const ListBatch = () => {
   //modal and offcanvas
   let [show, setShow] = useState(false)
   let [guide, setGuide] = useState(true)
+
+  useEffect(() => {
+    setInitializeAssays(true)
+    setInitializeReagents(true)
+    // eslint-disable-next-line
+  }, [])
 
 
   let changePage = (pageIndex) => {

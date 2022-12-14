@@ -12,6 +12,8 @@ export const AssayProvider = ({children}) => {
   let [assays, setAssays] = useState([])
   let [updating, setUpdating] = useState(false)
 
+  let [initializeAssays, setInitializeAssays] = useState(false)
+
   let getAssays = async () => {
     let response = await fetch(`${ServerAddress}/api/assays/`, {
       method: 'GET', 
@@ -35,17 +37,19 @@ export const AssayProvider = ({children}) => {
 
   useEffect(() => {
     setUpdating(false)
+    setInitializeAssays(false)
     if (user) {
       getAssays()
     }
     // eslint-disable-next-line
-  }, [updating, user])
+  }, [updating, initializeAssays])
 
   let contextData = {
     getAssays: getAssays,
     assays: assays,
     setUpdating: setUpdating,
     updating: updating,
+    setInitializeAssays: setInitializeAssays,
   }
 
   return (

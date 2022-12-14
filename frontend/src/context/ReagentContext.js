@@ -12,6 +12,8 @@ export const ReagentProvider = ({children}) => {
   let [reagents, setReagents] = useState([])
   let [updating, setUpdating] = useState(false)
 
+  let [initializeReagents, setInitializeReagents] = useState(false)
+
   let getReagents = async () => {
     let response = await fetch(`${ServerAddress}/api/reagents/`, {
       method: 'GET',
@@ -34,17 +36,19 @@ export const ReagentProvider = ({children}) => {
 
   useEffect(() => {
     setUpdating(false)
+    setInitializeReagents(false)
     if (user) {
       getReagents()
     }
     // eslint-disable-next-line
-  }, [updating, user])
+  }, [updating, initializeReagents])
 
   let contextData = {
     getReagents: getReagents,
     reagents: reagents,
     setUpdating: setUpdating,
     updating: updating,
+    setInitializeReagents: setInitializeReagents,
   }
 
   return (
