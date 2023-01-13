@@ -73,6 +73,7 @@ export const BatchProvider = ({children}) => {
 
     let data = await response.json()
     if(response.status === 200) {
+      console.log(data)
       setLabels(data)
     } else {
       alert('error')

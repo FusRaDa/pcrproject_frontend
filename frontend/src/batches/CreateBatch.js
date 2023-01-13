@@ -106,7 +106,7 @@ const CreateBatch = () => {
     }
 
     let labelData = batchData(e)
-  
+
     let response = await fetch(`${ServerAddress}/api/batches/create/`, {
       method: 'POST',
       headers: {
@@ -119,7 +119,7 @@ const CreateBatch = () => {
         'batchDate': date, 
         'dna_extraction': dna === true ? null : e.target.dna.value,
         'rna_extraction': rna === true ? null : e.target.rna.value,
-        'fieldLabels': labelData
+        'fieldLabels': labelData,
       })
     })
 
@@ -168,14 +168,31 @@ const CreateBatch = () => {
   let batchData = (e) => {
     e.preventDefault()
     let keys = []
+
+    if (labels.length === 0) {
+      console.log('no labels')
+      return {}
+    }
+
+    //if only one label handle it this way, Array.from doesnt create 1 array from one word it splits it into chars
+    if (labels.length === 1) {
+      let label = labels[0].label
+      let data = {}
+      data[label] = e.target.info.value
+      return data
+    }
+
     labels.map(label => (
       keys.push(label.label)
     ))
+    
     let values = Array.from(e.target.info)
+
     let data = {}
     for (var i = 0; i < values.length; i++) {
       data[keys[i]] = values[i].value   
     }
+
     return data
   }
 
